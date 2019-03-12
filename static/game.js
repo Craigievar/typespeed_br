@@ -34,6 +34,7 @@ function renderInGame(gameState){
   } else { 
     var player = players[socket.io.engine.id];
     if (player) {
+      console.log(player.won)
       ctx.font = '60px sans-serif';
       if (player.lost) {
         ctx.fillStyle = "#FF0000";

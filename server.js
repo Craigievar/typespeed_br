@@ -2,6 +2,8 @@
 var config = require('config');
 let WORDS = config.WORDS
 let MS_PER_WORD_BASE = config.MS_PER_WORD_BASE
+let MS_PER_WORD_MIN = config.MS_PER_WORD_MIN
+let MS_PER_WORD_DELTA = config.MS_PER_WORD_DELTA
 let WORDS_TO_LOSE = config.WORDS_TO_LOSE
 let MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START
 let COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH
@@ -30,7 +32,7 @@ io.on('connection', function(socket) {
 });
 
 function checkIfLost(player) {
-  if (player.nextWords && player.nextWords.length >= WORDS_TO_LOSE) {
+  if (player && player.nextWords.length >= WORDS_TO_LOSE) {
     return true; 
   }
   return false;
@@ -49,7 +51,7 @@ function newPlayer(socket) {
       x: 300,
       y: 300,
       prevWords: [],
-      nextWords: [randomWord()],
+      nextWords: [],
       lost: false,
       won: false,
       //target: findTarget(players, socket.id),
@@ -75,7 +77,6 @@ function findTarget(players, player) {
 }
 
 function updatePlayersLeft(gameState) {
-  //TODO -- filter to alive players and count. 
   playersLeft = -1
   if (gameState && gameState.players) {
     playersLeft += 1
@@ -89,7 +90,6 @@ function updatePlayersLeft(gameState) {
 }
 
 function numReadyPlayers(gameState) {
-  //TODO -- filter to alive players and count. 
   playersReady = -1
   if (gameState && gameState.players) {
     playersReady += 1
@@ -102,6 +102,34 @@ function numReadyPlayers(gameState) {
   return playersReady
 }
 
+function checkForWinner(gameState) {
+  if(updatePlayersLeft(gameState) === 1) {
+    gameState.players[Object.keys(gameState.players)[0]].won = true
+  }
+}
+
+var generateWords  = function (){
+  //generate words
+  for (var id in gameState.players) {
+    if (gameState.players[id] && gameState.state == 'INGAME' && !gameState.players[id].won) {
+
+      gameState.players[id].nextWords.push(randomWord());
+      //console.log(players[socket.id].nextWords);
+      gameState.players[id].lost = checkIfLost(gameState.players[id])
+      if (gameState.players[id].lost) {
+        checkForWinner(gameState)
+      }
+    }
+  }
+
+  if (gameState.delay > MS_PER_WORD_MIN) {
+    gameState.delay -= MS_PER_WORD_DELTA
+  }
+  
+  setTimeout(generateWords, gameState.delay)
+}
+
+
 function updateGameState(gameState) {
   if (gameState.state === 'LOBBY') {
     var playersReady = numReadyPlayers(gameState)
@@ -110,31 +138,27 @@ function updateGameState(gameState) {
       //start game!
       console.log("starting game")
       gameState.state = 'INGAME'
+      inCountdown = true
   
       for (var id in gameState.players) {
         gameState.players[id].inGame = true
       }
-
-      setInterval(function() {
-        for (var id in gameState.players) {
-          if (gameState.players[id] && gameState.state == 'INGAME' && !gameState.players[id].won) {
-
-            gameState.players[id].nextWords.push(randomWord());
-            //console.log(players[socket.id].nextWords);
-            gameState.players[id].lost = checkIfLost(gameState.players[id])
-          }
-        }
-      }, MS_PER_WORD_BASE);
-
     }
   } else if (gameState.state === 'INGAME') {
+
+
     if (gameState.loadTime >= 0) {
       gameState.loadTime -= 1000/60
-    }
-    gameState.playersLeft = updatePlayersLeft(gameState)
-    console.log(gameState.playersLeft)
-    if(gameState.playersLeft === 1){
-      gameState.players[Object.keys(gameState.players)[0]].won = true
+    } else {
+      if (inCountdown) {
+        inCountdown = false 
+        // kick off word generation
+        generateWords(gameState, 0)
+      }
+
+      gameState.playersLeft = updatePlayersLeft(gameState)
+      //console.log(gameState.playersLeft)
+      checkForWinner(gameState)
     }
   }
 }
@@ -145,24 +169,14 @@ var gameState = {
   state : 'LOBBY', // LOBBY, INGAME
   playersLeft : 0,
   loadTime: COUNTDOWN_LENGTH,
+  inCountdown: false,
+  delay: MS_PER_WORD_BASE,
   playersNeeded: MIN_PLAYERS_TO_START,
 };
-
-// console.log(COUNTDOWN_LENGTH)
-// console.log(gameState.loadTime)
 
 io.on('connection', function(socket) {
   socket.on('new player', function() {
     players[socket.id] = newPlayer(socket)
-    //console.log(players[socket.id].nextWords)
-    // setInterval(function() {
-    //   if (players[socket.id] && gameState.state == 'INGAME') {
-    //   //console.log('in loop');
-    //     players[socket.id].nextWords.push(randomWord());
-    //     //console.log(players[socket.id].nextWords);
-    //     players[socket.id].lost = checkIfLost(players[socket.id])
-    //   }
-    // }, MS_PER_WORD_BASE);
   }); 
 
   socket.on('disconnect', function() {
@@ -182,16 +196,16 @@ io.on('connection', function(socket) {
       var player = players[socket.id] || {};
       player.lost = checkIfLost(player)
       if (data.word) {
-
-        //console.log("Word submitted!")
         if (data.word.toLowerCase() === player.nextWords[0].toLowerCase()){
           //console.log("Correct")
           var word = player.nextWords.shift()
 
           target = findTarget(players, socket.id)
-          // console.log('target: ' + target)
+
           if (players[target]) { 
             players[target].nextWords.push(word)
+            players[target].lost = checkIfLost(player[target])
+            checkForWinner(gameState)
           }
         }
         else {
@@ -211,10 +225,6 @@ setInterval(function() {
   //console.log(gameState)
   updateGameState(gameState)
   io.sockets.emit('state', gameState);
+  console.log(gameState.delay)
 }, 1000 / 60);
 
-// setInterval(function() {
-//   for (var id in players) {
-//     console.log('player '+id+' targeting ' + players[id].target)
-//   }
-// }, 5000);
