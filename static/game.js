@@ -1,3 +1,7 @@
+let WORDS_TO_LOSE = 10
+let canvasWidth = 600
+let canvasHeight = 600
+
 var socket = io();
 
 socket.on('message', function(data) {
@@ -20,29 +24,37 @@ function isLetter(str) {
 function renderInGame(gameState){
   var players = gameState.players
   var canvas = document.getElementById('canvas');
-  canvas.width = 800;
-  canvas.height = 600;
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
   var ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 800, 600);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  console.log(gameState.loadTime)
+  //console.log(gameState.loadTime)
+
+  // grey bg
+  ctx.fillStyle = '#D3D3D3'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
   if(gameState.loadTime >= 0) {
     ctx.font = '60px sans-serif';
     ctx.fillStyle = "#008B00";
-    ctx.fillText(Math.floor(gameState.loadTime/1000)+1, canvas.width/2, canvas.height / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText(Math.floor(gameState.loadTime/1000)+1, canvas.width/2, canvas.height / 2-15);
     ctx.restore();
   } else { 
     var player = players[socket.io.engine.id];
     if (player) {
-      console.log(player.won)
-      ctx.font = '60px sans-serif';
+      //console.log(player.won)
+      ctx.font = '40px sans-serif';
       if (player.lost) {
         ctx.fillStyle = "#FF0000";
-        ctx.fillText("You Lose :(", 15, canvas.height / 2);
+        ctx.textAlign = 'center';
+        ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2);
         ctx.restore();
       } else if (player.won) {
         ctx.fillStyle = "#008B00";
-        ctx.fillText("You Win!!!", 15, canvas.height / 2);
+        ctx.textAlign = 'center';
+        ctx.fillText("You Win!!!", 15, canvas.width/2, canvas.height / 2);
         ctx.restore();
       }
       else {
@@ -50,51 +62,112 @@ function renderInGame(gameState){
         if (player.prevWords.length > 0) {
           lastWord = player.prevWords[player.prevWords.length-1]
         }
-        ctx.fillText(lastWord, 15, canvas.height / 2);
-        ctx.fillText(local.currString, 15, canvas.height / 2 +50);
-        ctx.fillStyle = "#FF0000";
-        ctx.fillText(player.nextWords.join(' '), 15, canvas.height/2-100)
+        ctx.fillStyle = '#808080'
+        ctx.fillRect(0, canvas.height/2-45, canvas.width, 60)
+        ctx.fillStyle = '#E8E8E8'
+        ctx.fillRect(0, canvas.height/2+15, canvas.width, 60)
+
+
+        ctx.font = '40px sans-serif';
+        ctx.fillStyle = 'black'
+        ctx.lineWidth = 2
+        //ctx.fillText(lastWord, 15, canvas.height / 2);
+        ctx.fillText(local.currString, 15, canvas.height / 2 + 55);
+
+        //words to write
+        ctx.textAlign = 'left';
+        ctx.fillStyle = "#580000";
+        ctx.fillText(player.nextWords.join(' '), 15, canvas.height/2+0)
+
+        //queue
+        ctx.textAlign='right'
+        ctx.font = '20px sans-serif';
+        if (player.nextWords.length > WORDS_TO_LOSE - 3) {
+          ctx.fillStyle = "#CC0000";
+        } else if (player.nextWords.length < 3) {
+          ctx.fillStyle = "#009933"
+        } else {
+          ctx.fillStyle = '#000000'
+        }
+        ctx.fillText('Words in Queue: ' + player.nextWords.length, 
+          canvas.width - 10, 
+          canvas.height/2-60)
+
+        //players left 
+        ctx.fillStyle = "#000000"
+        ctx.font = '30px sans-serif';
+        ctx.textAlign='center'
+        ctx.fillText('Players Left: ' + gameState.playersLeft, canvas.width/2, 35)
+
+        ctx.fillText('Kills: ' + player.kills, canvas.width/2, 70)
+        ctx.fillStyle = "#009933";
+        ctx.fillText('Words: ' + player.rightAnswers, canvas.width/2, 105)
+        ctx.fillStyle = "#CC0000";
+        ctx.fillText('Mistakes: ' + player.wrongAnswers, canvas.width/2, 140)
+
         ctx.restore();
       }
     }
-   // }
   }
 }
 
 function renderGetName(players){
   var canvas = document.getElementById('canvas');
-  canvas.width = 800;
-  canvas.height = 600;
+
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
   var ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 800, 600);
+
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = '#D3D3D3'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
   var player = players[socket.io.engine.id];
   if (player) {
-    ctx.font = '60px sans-serif';
-    ctx.fillText(local.currString, 15, canvas.height / 2 +50);
+    ctx.font = '30px sans-serif';
+    ctx.textAlign='center'
     ctx.fillStyle = "#FF0000";
-    ctx.fillText('Enter a nickname', 15, canvas.height/2-100);
+
+    ctx.fillText('Enter Your Nickname!', canvas.width/2, canvas.height/2-50);
+    ctx.font = '30px sans-serif';
+    ctx.fillStyle = 'black'
+    ctx.lineWidth = 2
+    ctx.textAlign='center'
+    ctx.fillText(local.currString, canvas.width/2, canvas.height / 2 + 10);
     ctx.restore();
   }
 }
 
 function renderLobby(gameState){
-  if(gameState) {
-    var canvas = document.getElementById('canvas');
-    canvas.width = 800;
-    canvas.height = 600;
-    var ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, 800, 600);
-    ctx.font = '60px sans-serif';
-    ctx.fillStyle = "#FF0000";
-    ctx.fillText('Need ' + gameState.playersNeeded + ' more players to start', 
-      15, canvas.height/2-100)
-    ctx.restore
-  }
+  
+  var canvas = document.getElementById('canvas');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = '#D3D3D3'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.font = '30px sans-serif';
+  ctx.textAlign='center'
+  ctx.fillStyle = "#FF0000";
+  if(gameState && gameState.state != 'INGAME') {
+    if(gameState.playersNeeded === 1){
+      ctx.fillText('Need ' + gameState.playersNeeded + ' more player', 
+        canvas.width/2, canvas.height/2-15)     
+    } else {
+      ctx.fillText('Need ' + gameState.playersNeeded + ' more players', 
+        canvas.width/2, canvas.height/2-15)
+    }
+  } else {
+    ctx.fillText('Ingame with ' + gameState.playersLeft + ' players left', 
+    canvas.width/2, canvas.height/2)     
+ }
+  ctx.restore
 }
 
 document.addEventListener('keyup', function(event) {
   if(isLetter(String.fromCharCode(event.keyCode))) {
   	local.currString += String.fromCharCode(event.keyCode).toLowerCase();
+    //console.log(local.currString)
   }
   // backspace
   else if(event.keyCode === 8) { 
@@ -132,11 +205,16 @@ document.addEventListener('keyup', function(event) {
 socket.emit('new player');
 
 socket.on('state', function(gameState) {
-  console.log(gameState)
+  //console.log(gameState)
   local.gameState = gameState
   //console.log(gameState.state)
   if (gameState.state === 'INGAME') {
-    renderInGame(gameState)
+    if (gameState.players[socket.io.engine.id] && gameState.players[socket.io.engine.id].inGame){
+      renderInGame(gameState)
+    } else {
+      renderLobby(gameState)
+    }
+    
   } else if (gameState.state === 'LOBBY') {
     if (gameState.players[socket.io.engine.id] && !gameState.players[socket.io.engine.id].ready) {
       renderGetName(gameState['players'])

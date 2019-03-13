@@ -7,6 +7,7 @@ let MS_PER_WORD_DELTA = config.MS_PER_WORD_DELTA
 let WORDS_TO_LOSE = config.WORDS_TO_LOSE
 let MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START
 let COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH
+let PLAYERS_TO_WIN = config.PLAYERS_TO_WIN
 
 // Dependencies
 var express = require('express');
@@ -59,6 +60,9 @@ function newPlayer(socket) {
       inGame: false,
       ready: false,
       name: '',
+      kills: 0,
+      wrongAnswers: 0,
+      rightAnswers: 0,
     } 
 }
 
@@ -103,7 +107,7 @@ function numReadyPlayers(gameState) {
 }
 
 function checkForWinner(gameState) {
-  if(updatePlayersLeft(gameState) === 1) {
+  if(updatePlayersLeft(gameState) === PLAYERS_TO_WIN) {
     gameState.players[Object.keys(gameState.players)[0]].won = true
   }
 }
@@ -198,6 +202,7 @@ io.on('connection', function(socket) {
       if (data.word) {
         if (data.word.toLowerCase() === player.nextWords[0].toLowerCase()){
           //console.log("Correct")
+          player.rightAnswers++
           var word = player.nextWords.shift()
 
           target = findTarget(players, socket.id)
@@ -210,6 +215,7 @@ io.on('connection', function(socket) {
         }
         else {
           //console.log("Incorrect")
+          player.wrongAnswers++
           player.nextWords.shift()
           player.nextWords.push(randomWord())
           player.nextWords.push(randomWord())
@@ -225,6 +231,6 @@ setInterval(function() {
   //console.log(gameState)
   updateGameState(gameState)
   io.sockets.emit('state', gameState);
-  console.log(gameState.delay)
+  //console.log(gameState.delay)
 }, 1000 / 60);
 
