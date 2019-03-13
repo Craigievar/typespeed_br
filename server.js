@@ -150,7 +150,7 @@ function updateGameState(gameState) {
       //start game!
       console.log("starting game")
       gameState.state = 'INGAME'
-      inCountdown = true
+      gameState.inCountdown = true
   
       for (var id in gameState.players) {
         gameState.players[id].inGame = true
@@ -162,8 +162,8 @@ function updateGameState(gameState) {
     if (gameState.loadTime >= 0) {
       gameState.loadTime -= 1000/60
     } else {
-      if (inCountdown) {
-        inCountdown = false 
+      if (gameState.inCountdown) {
+        gameState.inCountdown = false 
         // kick off word generation
         generateWords(gameState, 0)
       }
@@ -206,7 +206,7 @@ io.on('connection', function(socket) {
   socket.on('start', function(data) {
     console.log("starting game")
     gameState.state = 'INGAME'
-    inCountdown = true
+    gameState.inCountdown = true
 
     for (var id in gameState.players) {
       gameState.players[id].inGame = true
