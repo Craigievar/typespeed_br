@@ -1,4 +1,4 @@
-let WORDS_TO_LOSE = 10
+let WORDS_TO_LOSE = 30
 let canvasWidth = 600
 let canvasHeight = 600
 
@@ -15,6 +15,10 @@ var input = {
 var local = {
   currString: '', 
   gameState: {},
+}
+
+function start() {
+  socket.emit('start', {});
 }
 
 function isLetter(str) {
@@ -49,12 +53,17 @@ function renderInGame(gameState){
       if (player.lost) {
         ctx.fillStyle = "#FF0000";
         ctx.textAlign = 'center';
-        ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2);
+        if (player.lastAttacker && player.lastAttacker.length > 0) {
+          ctx.fillText("Killed by " + gameState.players[player.lastAttacker].name, canvas.width/2, canvas.height / 2);
+        } else {
+          ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2);
+        }
+        
         ctx.restore();
       } else if (player.won) {
         ctx.fillStyle = "#008B00";
         ctx.textAlign = 'center';
-        ctx.fillText("You Win!!!", 15, canvas.width/2, canvas.height / 2);
+        ctx.fillText("You Win!!!", canvas.width/2, canvas.height / 2);
         ctx.restore();
       }
       else {
@@ -89,7 +98,7 @@ function renderInGame(gameState){
         } else {
           ctx.fillStyle = '#000000'
         }
-        ctx.fillText('Words in Queue: ' + player.nextWords.length, 
+        ctx.fillText('Words in Queue: ' + player.nextWords.length + '/' + WORDS_TO_LOSE, 
           canvas.width - 10, 
           canvas.height/2-60)
 

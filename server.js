@@ -63,6 +63,7 @@ function newPlayer(socket) {
       kills: 0,
       wrongAnswers: 0,
       rightAnswers: 0,
+      lastAttacker: '',
     } 
 }
 
@@ -108,7 +109,11 @@ function numReadyPlayers(gameState) {
 
 function checkForWinner(gameState) {
   if(updatePlayersLeft(gameState) === PLAYERS_TO_WIN) {
-    gameState.players[Object.keys(gameState.players)[0]].won = true
+    for (id in gameState.players) {
+      if (gameState.players[id] && !gameState.players[id].lost){
+        gameState.players[id].won = true
+      }
+    }
   }
 }
 
@@ -121,6 +126,9 @@ var generateWords  = function (){
       //console.log(players[socket.id].nextWords);
       gameState.players[id].lost = checkIfLost(gameState.players[id])
       if (gameState.players[id].lost) {
+        if (gameState.players[gameState.players[id].lastAttacker]) {
+          gameState.players[gameState.players[id].lastAttacker].kills++
+        }
         checkForWinner(gameState)
       }
     }
@@ -195,6 +203,16 @@ io.on('connection', function(socket) {
     players[socket.id].ready = true
   })
 
+  socket.on('start', function(data) {
+    console.log("starting game")
+    gameState.state = 'INGAME'
+    inCountdown = true
+
+    for (var id in gameState.players) {
+      gameState.players[id].inGame = true
+    }
+  })
+
   socket.on('input', function(data) {
     if (gameState.state == 'INGAME') {
       var player = players[socket.id] || {};
@@ -209,7 +227,11 @@ io.on('connection', function(socket) {
 
           if (players[target]) { 
             players[target].nextWords.push(word)
+            players[target].lastAttacker = socket.id
             players[target].lost = checkIfLost(player[target])
+            if (player.lost && gameState.players[player.lastAttacker]) {
+              gameState.players[player.lastAttacker].kills++
+            }
             checkForWinner(gameState)
           }
         }
@@ -219,7 +241,10 @@ io.on('connection', function(socket) {
           player.nextWords.shift()
           player.nextWords.push(randomWord())
           player.nextWords.push(randomWord())
-          
+          player.lost = checkIfLost(player)
+          if (player.lost && players[player.lastAttacker]) {
+            gameState.players[player.lastAttacker].kills++
+          }
         }
         player.prevWords.push(data.word);
       }
