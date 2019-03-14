@@ -25,7 +25,67 @@ function isLetter(str) {
   return str.length === 1 && str.match(/[a-z]/i);
 }
 
+function renderEndGame(gameState){
+  //console.log('rendering endgame')
+  var players = gameState.players
+  var player = players[socket.io.engine.id];
+  var canvas = document.getElementById('canvas');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = '#D3D3D3'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.font = '40px sans-serif';
+  ctx.textAlign = 'center';
+  if (player && !player.inGame) {
+    if (gameState.state === 'INGAME'){
+      ctx.fillStyle = "#FF0000";
+      ctx.textAlign = 'center';
+      ctx.fillText('In game with ' + gameState.playersLeft + ' players left', 
+      canvas.width/2, canvas.height/2-20)   
+    } else {
+      ctx.fillText("Next Game Starts In " + Math.floor(gameState.loadTime/1000), canvas.width/2, canvas.height / 2+95);  
+    }
+  } else if (player && player.lost) {
+    ctx.fillStyle = "#FF0000";
+    ctx.textAlign = 'center';
+    if (player.lastAttacker && player.lastAttacker.length > 0) {
+      ctx.fillText("Killed by " + gameState.players[player.lastAttacker].name, canvas.width/2, canvas.height / 2-60);
+    } else {
+      ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2 -60);
+    }
+    ctx.fillText(Math.round(player.rightAnswers/(player.deathTime/1000./60)) + " WPM", canvas.width/2, canvas.height / 2 - 20);
+    ctx.fillText("Your accuracy: " + Math.round(player.rightAnswers/(player.rightAnswers+player.wrongAnswers) * 100) +"%", 
+      canvas.width/2, canvas.height / 2+20);
+    ctx.fillText("You KO'd " + player.kills + " players", 
+      canvas.width/2, canvas.height / 2+60);
+    ctx.fillText("Next Game Starts In " + Math.floor(gameState.loadTime/1000), canvas.width/2, canvas.height / 2+95);
+        
+        
+  } else if (player && player.won) {
+    //console.log("handling won case")
+    ctx.fillStyle = "#008B00";
+    ctx.textAlign = 'center';
+    ctx.fillText("You Won!", canvas.width/2, canvas.height / 2 - 60);
+    ctx.fillText(Math.round(player.rightAnswers/(gameState.endTime/1000./60)) + " WPM", canvas.width/2, canvas.height / 2 - 20);
+    ctx.fillText("Your accuracy: " + Math.round(player.rightAnswers/(player.rightAnswers+player.wrongAnswers) * 100) +"%", 
+      canvas.width/2, canvas.height / 2+20);
+    ctx.fillText("You KO'd " + player.kills + " players", 
+      canvas.width/2, canvas.height / 2+60);
+    ctx.fillText("Next Game Starts In " + Math.floor(gameState.loadTime/1000), canvas.width/2, canvas.height / 2+95);
+    
+  } else {
+    //handle new players
+    console.log('endgame without win or loss')
+  }
+  
+  ctx.restore();
+}
+
 function renderInGame(gameState){
+  console.log('rendering game')
+  //console.log('rendering game')
   var players = gameState.players
   var canvas = document.getElementById('canvas');
   canvas.width = canvasWidth;
@@ -50,87 +110,62 @@ function renderInGame(gameState){
     if (player) {
       //console.log(player.won)
       ctx.font = '40px sans-serif';
-      if (player.lost) {
-        ctx.fillStyle = "#FF0000";
-        ctx.textAlign = 'center';
-        if (player.lastAttacker && player.lastAttacker.length > 0) {
-          ctx.fillText("Killed by " + gameState.players[player.lastAttacker].name, canvas.width/2, canvas.height / 2-60);
-        } else {
-          ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2 -60);
-        }
-        ctx.fillText(Math.round(player.rightAnswers/(player.deathTime/1000./60)) + " WPM", canvas.width/2, canvas.height / 2 - 20);
-        ctx.fillText("Your accuracy: " + Math.round(player.rightAnswers/(player.rightAnswers+player.wrongAnswers) * 100) +"%", 
-          canvas.width/2, canvas.height / 2+20);
-        ctx.fillText("You KO'd " + player.kills + " players", 
-          canvas.width/2, canvas.height / 2+60);
-        
-        ctx.restore();
-      } else if (player.won) {
-        ctx.fillStyle = "#008B00";
-        ctx.textAlign = 'center';
-        ctx.fillText("You Won!", canvas.width/2, canvas.height / 2 - 60);
-        ctx.fillText(Math.round(player.rightAnswers/(gameState.endTime/1000./60)) + " WPM", canvas.width/2, canvas.height / 2 - 20);
-        ctx.fillText("Your accuracy: " + Math.round(player.rightAnswers/(player.rightAnswers+player.wrongAnswers) * 100) +"%", 
-          canvas.width/2, canvas.height / 2+20);
-        ctx.fillText("You KO'd " + player.kills + " players", 
-          canvas.width/2, canvas.height / 2+60);
-        ctx.restore();
+
+      var lastWord = ''
+      if (player.prevWords.length > 0) {
+        lastWord = player.prevWords[player.prevWords.length-1]
       }
-      else {
-        var lastWord = ''
-        if (player.prevWords.length > 0) {
-          lastWord = player.prevWords[player.prevWords.length-1]
-        }
-        ctx.fillStyle = '#808080'
-        ctx.fillRect(0, canvas.height/2-45, canvas.width, 60)
-        ctx.fillStyle = '#E8E8E8'
-        ctx.fillRect(0, canvas.height/2+15, canvas.width, 60)
+      ctx.fillStyle = '#808080'
+      ctx.fillRect(0, canvas.height/2-45, canvas.width, 60)
+      ctx.fillStyle = '#E8E8E8'
+      ctx.fillRect(0, canvas.height/2+15, canvas.width, 60)
 
 
-        ctx.font = '40px sans-serif';
-        ctx.fillStyle = 'black'
-        ctx.lineWidth = 2
-        //ctx.fillText(lastWord, 15, canvas.height / 2);
-        ctx.fillText(local.currString, 15, canvas.height / 2 + 55);
+      ctx.font = '40px sans-serif';
+      ctx.fillStyle = 'black'
+      ctx.lineWidth = 2
+      //ctx.fillText(lastWord, 15, canvas.height / 2);
+      ctx.fillText(local.currString, 15, canvas.height / 2 + 55);
 
-        //words to write
-        ctx.textAlign = 'left';
-        ctx.fillStyle = "#580000";
-        ctx.fillText(player.nextWords.join(' '), 15, canvas.height/2+0)
+      //words to write
+      ctx.textAlign = 'left';
+      ctx.fillStyle = "#580000";
+      ctx.fillText(player.nextWords.join(' '), 15, canvas.height/2+0)
 
-        //queue
-        ctx.textAlign='right'
-        ctx.font = '20px sans-serif';
-        if (player.nextWords.length > WORDS_TO_LOSE - 3) {
-          ctx.fillStyle = "#CC0000";
-        } else if (player.nextWords.length < 3) {
-          ctx.fillStyle = "#009933"
-        } else {
-          ctx.fillStyle = '#000000'
-        }
-        ctx.fillText('Words in Queue: ' + player.nextWords.length + '/' + WORDS_TO_LOSE, 
-          canvas.width - 10, 
-          canvas.height/2-60)
-
-        //players left 
-        ctx.fillStyle = "#000000"
-        ctx.font = '30px sans-serif';
-        ctx.textAlign='center'
-        ctx.fillText('Players Left: ' + gameState.playersLeft, canvas.width/2, 35)
-
-        ctx.fillText('KOs: ' + player.kills, canvas.width/2, 70)
-        ctx.fillStyle = "#009933";
-        ctx.fillText('Words: ' + player.rightAnswers, canvas.width/2, 105)
+      //queue
+      ctx.textAlign='right'
+      ctx.font = '20px sans-serif';
+      if (player.nextWords.length > WORDS_TO_LOSE - 3) {
         ctx.fillStyle = "#CC0000";
-        ctx.fillText('Mistakes: ' + player.wrongAnswers, canvas.width/2, 140)
-
-        ctx.restore();
+      } else if (player.nextWords.length < 3) {
+        ctx.fillStyle = "#009933"
+      } else {
+        ctx.fillStyle = '#000000'
       }
+      ctx.fillText('Words in Queue: ' + player.nextWords.length + '/' + WORDS_TO_LOSE, 
+        canvas.width - 10, 
+        canvas.height/2-60)
+
+      //players left 
+      ctx.fillStyle = "#000000"
+      ctx.font = '30px sans-serif';
+      ctx.textAlign='center'
+      ctx.fillText('Players Left: ' + gameState.playersLeft, canvas.width/2, 35)
+
+      ctx.fillText('KOs: ' + player.kills, canvas.width/2, 70)
+      ctx.fillStyle = "#009933";
+      ctx.fillText('Words: ' + player.rightAnswers, canvas.width/2, 105)
+      ctx.fillStyle = "#CC0000";
+      ctx.fillText('Mistakes: ' + player.wrongAnswers, canvas.width/2, 140)
+
+      ctx.restore();
+      
     }
   }
 }
 
 function renderGetName(players){
+  console.log('rendering name')
   var canvas = document.getElementById('canvas');
 
   canvas.width = canvasWidth;
@@ -157,7 +192,7 @@ function renderGetName(players){
 }
 
 function renderLobby(gameState){
-  
+  //console.log('rendering lobby')
   var canvas = document.getElementById('canvas');
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
@@ -177,8 +212,23 @@ function renderLobby(gameState){
         canvas.width/2, canvas.height/2-15)
     }
   } else {
-    ctx.fillText('Ingame with ' + gameState.playersLeft + ' players left', 
-    canvas.width/2, canvas.height/2)     
+    ctx.textAlign='center'
+    if (gameState.state === 'INGAME' && gameState.playersLeft > 0) {
+      ctx.fillText('In game with ' + gameState.playersLeft + ' players left', 
+        canvas.width/2, canvas.height/2-20)     
+    } else {//(gameState.winner.length > 0) {
+      console.log('uhhh')
+      if(gameState.winner.length > 0 ){
+        ctx.fillText('Game Won By ' + gameState.players[gameState.winner].name,
+        canvas.width/2, canvas.height/2+20)          
+      } else {
+        ctx.fillText('Waiting for Next Game',
+        canvas.width/2, canvas.height/2+20)       
+      }
+      ctx.fillText("Next Game Starts In " + Math.floor(gameState.loadTime/1000), canvas.width/2, canvas.height / 2+95);
+
+    }
+    
  }
   ctx.restore
 }
@@ -227,19 +277,36 @@ socket.on('state', function(gameState) {
   //console.log(gameState)
   local.gameState = gameState
   //console.log(gameState.state)
-  if (gameState.state === 'INGAME') {
+  // if the player won/lost show their endgame screen
+  // if it's postgame it'll count down
+  if(gameState.players[socket.io.engine.id] && 
+    !gameState.players[socket.io.engine.id].inGame &&
+    gameState.players[socket.io.engine.id].name.length === 0) {
+    renderGetName(gameState['players'])
+  }
+
+  else if (
+    (gameState.state === 'INGAME' || gameState.state === 'POSTGAME') &&
+    gameState.players[socket.io.engine.id] && ((gameState.players[socket.io.engine.id].inGame &&
+    (gameState.players[socket.io.engine.id].lost || gameState.players[socket.io.engine.id].won)) || 
+    !gameState.players[socket.io.engine.id].inGame)
+    ){
+    console.log
+    renderEndGame(gameState)
+  }
+
+  // otherwise if it's ingame, show game
+  else if (gameState.state === 'INGAME') {
     if (gameState.players[socket.io.engine.id] && gameState.players[socket.io.engine.id].inGame){
       renderInGame(gameState)
     } else {
       renderLobby(gameState)
     }
     
-  } else if (gameState.state === 'LOBBY') {
-    if (gameState.players[socket.io.engine.id] && !gameState.players[socket.io.engine.id].ready) {
-      renderGetName(gameState['players'])
-    } else {
-      renderLobby(gameState)
-    }
+  // otherwise it should be in lobby so we just show lobby info
+  } else if (gameState.state === 'LOBBY' || gameState.state === 'POSTGAME') {
+    renderLobby(gameState)
+    
   }
   
 });
