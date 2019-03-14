@@ -84,7 +84,7 @@ function renderEndGame(gameState){
 }
 
 function renderInGame(gameState){
-  console.log('rendering game')
+  //console.log('rendering game')
   //console.log('rendering game')
   var players = gameState.players
   var canvas = document.getElementById('canvas');
@@ -165,7 +165,7 @@ function renderInGame(gameState){
 }
 
 function renderGetName(players){
-  console.log('rendering name')
+  //console.log('rendering name')
   var canvas = document.getElementById('canvas');
 
   canvas.width = canvasWidth;
@@ -217,7 +217,7 @@ function renderLobby(gameState){
       ctx.fillText('In game with ' + gameState.playersLeft + ' players left', 
         canvas.width/2, canvas.height/2-20)     
     } else {//(gameState.winner.length > 0) {
-      console.log('uhhh')
+      //console.log('uhhh')
       if(gameState.winner.length > 0 ){
         ctx.fillText('Game Won By ' + gameState.players[gameState.winner].name,
         canvas.width/2, canvas.height/2+20)          
@@ -291,7 +291,6 @@ socket.on('state', function(gameState) {
     (gameState.players[socket.io.engine.id].lost || gameState.players[socket.io.engine.id].won)) || 
     !gameState.players[socket.io.engine.id].inGame)
     ){
-    console.log
     renderEndGame(gameState)
   }
 

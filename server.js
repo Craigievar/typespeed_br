@@ -36,15 +36,13 @@ io.on('connection', function(socket) {
 });
 
 function resetGame(gameState) {
-  gameState = {
-    players : gameState.players,
-    state : 'LOBBY', // LOBBY, INGAME
-    playersLeft : 0,
-    loadTime: COUNTDOWN_LENGTH,
-    inCountdown: false,
-    delay: MS_PER_WORD_BASE,
-    playersNeeded: MIN_PLAYERS_TO_START,
-  };
+  console.log("Updating game state")
+  gameState.state = 'LOBBY'
+  gameState.playersLeft = 0
+  gameState.loadTime = COUNTDOWN_LENGTH
+  gameState.inCountdown = false
+  gameState.delay = MS_PER_WORD_BASE
+  gameState.playersNeeded = MIN_PLAYERS_TO_START
 
   for (var id in gameState.players){
     var name = players[id].name
@@ -73,8 +71,6 @@ function randomWord() {
 
 function newPlayer(socket) {
   return {
-      x: 300,
-      y: 300,
       prevWords: [],
       nextWords: [],
       lost: false,
@@ -219,9 +215,7 @@ function updateGameState(gameState) {
     else {
       console.log(gameState.state)
       console.log(gameState.loadTime)
-      console.log("resetGame")
       resetGame(gameState)
-      gameState.state = 'LOBBY'
     }
   }
 }
@@ -279,7 +273,7 @@ io.on('connection', function(socket) {
 
           target = findTarget(players, socket.id)
 
-          if (players[target]) { 
+          if (players[target]) {
             players[target].nextWords.push(word)
             players[target].lastAttacker = socket.id
             var hadLost = players[target].lost
