@@ -1,4 +1,4 @@
-let WORDS_TO_LOSE = 30
+let WORDS_TO_LOSE = 10
 let canvasWidth = 600
 let canvasHeight = 600
 
@@ -54,16 +54,26 @@ function renderInGame(gameState){
         ctx.fillStyle = "#FF0000";
         ctx.textAlign = 'center';
         if (player.lastAttacker && player.lastAttacker.length > 0) {
-          ctx.fillText("Killed by " + gameState.players[player.lastAttacker].name, canvas.width/2, canvas.height / 2);
+          ctx.fillText("Killed by " + gameState.players[player.lastAttacker].name, canvas.width/2, canvas.height / 2-60);
         } else {
-          ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2);
+          ctx.fillText("You Lose :(", canvas.width/2, canvas.height / 2 -60);
         }
+        ctx.fillText(Math.round(player.rightAnswers/(player.deathTime/1000./60)) + " WPM", canvas.width/2, canvas.height / 2 - 20);
+        ctx.fillText("Your accuracy: " + Math.round(player.rightAnswers/(player.rightAnswers+player.wrongAnswers) * 100) +"%", 
+          canvas.width/2, canvas.height / 2+20);
+        ctx.fillText("You KO'd " + player.kills + " players", 
+          canvas.width/2, canvas.height / 2+60);
         
         ctx.restore();
       } else if (player.won) {
         ctx.fillStyle = "#008B00";
         ctx.textAlign = 'center';
-        ctx.fillText("You Win!!!", canvas.width/2, canvas.height / 2);
+        ctx.fillText("You Won!", canvas.width/2, canvas.height / 2 - 60);
+        ctx.fillText(Math.round(player.rightAnswers/(gameState.endTime/1000./60)) + " WPM", canvas.width/2, canvas.height / 2 - 20);
+        ctx.fillText("Your accuracy: " + Math.round(player.rightAnswers/(player.rightAnswers+player.wrongAnswers) * 100) +"%", 
+          canvas.width/2, canvas.height / 2+20);
+        ctx.fillText("You KO'd " + player.kills + " players", 
+          canvas.width/2, canvas.height / 2+60);
         ctx.restore();
       }
       else {
@@ -108,7 +118,7 @@ function renderInGame(gameState){
         ctx.textAlign='center'
         ctx.fillText('Players Left: ' + gameState.playersLeft, canvas.width/2, 35)
 
-        ctx.fillText('Kills: ' + player.kills, canvas.width/2, 70)
+        ctx.fillText('KOs: ' + player.kills, canvas.width/2, 70)
         ctx.fillStyle = "#009933";
         ctx.fillText('Words: ' + player.rightAnswers, canvas.width/2, 105)
         ctx.fillStyle = "#CC0000";

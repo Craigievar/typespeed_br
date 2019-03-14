@@ -64,6 +64,7 @@ function newPlayer(socket) {
       wrongAnswers: 0,
       rightAnswers: 0,
       lastAttacker: '',
+      deathTime: 1,
     } 
 }
 
@@ -86,7 +87,7 @@ function updatePlayersLeft(gameState) {
   if (gameState && gameState.players) {
     playersLeft += 1
     for (var id in gameState.players) {
-      if (!gameState.players[id].lost) {
+      if (!gameState.players[id].lost && gameState.players[id].inGame) {
         playersLeft += 1
       }
     }
@@ -109,6 +110,9 @@ function numReadyPlayers(gameState) {
 
 function checkForWinner(gameState) {
   if(updatePlayersLeft(gameState) === PLAYERS_TO_WIN) {
+    if (gameState.endTime === 0) {
+      gameState.endTime = gameState.time
+    }
     for (id in gameState.players) {
       if (gameState.players[id] && !gameState.players[id].lost){
         gameState.players[id].won = true
@@ -120,12 +124,14 @@ function checkForWinner(gameState) {
 var generateWords  = function (){
   //generate words
   for (var id in gameState.players) {
-    if (gameState.players[id] && gameState.state == 'INGAME' && !gameState.players[id].won) {
+    if (gameState.players[id] && gameState.state == 'INGAME' && 
+      !gameState.players[id].won && !gameState.players[id].lost) {
 
       gameState.players[id].nextWords.push(randomWord());
       //console.log(players[socket.id].nextWords);
       gameState.players[id].lost = checkIfLost(gameState.players[id])
       if (gameState.players[id].lost) {
+        gameState.players[id].deathTime = gameState.time
         if (gameState.players[gameState.players[id].lastAttacker]) {
           gameState.players[gameState.players[id].lastAttacker].kills++
         }
@@ -162,6 +168,7 @@ function updateGameState(gameState) {
     if (gameState.loadTime >= 0) {
       gameState.loadTime -= 1000/60
     } else {
+      gameState.time += 1000/60
       if (gameState.inCountdown) {
         gameState.inCountdown = false 
         // kick off word generation
@@ -184,6 +191,8 @@ var gameState = {
   inCountdown: false,
   delay: MS_PER_WORD_BASE,
   playersNeeded: MIN_PLAYERS_TO_START,
+  time: 0,
+  endTime: 0,
 };
 
 io.on('connection', function(socket) {
@@ -228,9 +237,13 @@ io.on('connection', function(socket) {
           if (players[target]) { 
             players[target].nextWords.push(word)
             players[target].lastAttacker = socket.id
+            var hadLost = players[target].lost
             players[target].lost = checkIfLost(player[target])
-            if (player.lost && gameState.players[player.lastAttacker]) {
-              gameState.players[player.lastAttacker].kills++
+            if (players[target].lost && !hadLost) {
+              gameState.players[target].deathTime = gameState.time
+              if(gameState.players[players[target].lastAttacker]) {
+                gameState.players[players[target].lastAttacker].kills++
+              }
             }
             checkForWinner(gameState)
           }
@@ -241,9 +254,11 @@ io.on('connection', function(socket) {
           player.nextWords.shift()
           player.nextWords.push(randomWord())
           player.nextWords.push(randomWord())
-          player.lost = checkIfLost(player)
-          if (player.lost && players[player.lastAttacker]) {
-            gameState.players[player.lastAttacker].kills++
+          if (player.lost) {
+            gameState.players[id].deathTime = gameState.time
+            if(gameState.players[player.lastAttacker]) {
+              gameState.players[player.lastAttacker].kills++
+            }
           }
         }
         player.prevWords.push(data.word);
