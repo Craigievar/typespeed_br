@@ -92,7 +92,7 @@ function newPlayer(socket) {
 function findTarget(players, player) {
   var playerList = Object.keys(players)
   var filtered = playerList.filter(function(value, index, arr){
-    return value != player && players[value].inGame && !players[value].won && players[value].lost
+    return value != player && players[value].inGame && !players[value].won && !players[value].lost
   });
   if (filtered.length > 0) {
     var randomId = randomElement(filtered)
