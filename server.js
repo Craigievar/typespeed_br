@@ -1,4 +1,9 @@
-// Config
+/*
+  Basically, we want to refactor win checks, etc. 
+  out of player actions (just update to track state there)
+*/
+
+// Unpack config file
 var config = require('config');
 let WORDS = config.WORDS
 let MS_PER_WORD_BASE = config.MS_PER_WORD_BASE
@@ -22,11 +27,13 @@ var server = http.Server(app);
 var io = socketIO(server);
 app.set('port', 5000);
 app.use('/static', express.static(__dirname + '/static'));
-// Routing
+
+// Route requests
 app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname, 'index.html'));
 });
-// Starts the server.
+
+// Start the server.
 server.listen(process.env.PORT || 5000, function() {
   console.log('Starting server on port 5000');
 });
@@ -35,23 +42,13 @@ server.listen(process.env.PORT || 5000, function() {
 io.on('connection', function(socket) {
 });
 
-function resetGame(gameState) {
-  console.log("Updating game state")
-  gameState.state = 'LOBBY'
-  gameState.playersLeft = 0
-  gameState.loadTime = COUNTDOWN_LENGTH
-  gameState.inCountdown = false
-  gameState.delay = MS_PER_WORD_BASE
-  gameState.playersNeeded = MIN_PLAYERS_TO_START
+ 
+function randomElement(array) {
+  return array[Math.floor(Math.random()*array.length)]
+}
 
-  for (var id in gameState.players){
-    var name = players[id].name
-    players[id] = newPlayer()
-    players[id].name = name
-    if (name.length > 0 ){
-      players[id].ready = true
-    }
-  }
+function randomWord() {
+  return randomElement(WORDS)
 }
 
 function checkIfLost(player) {
@@ -59,14 +56,6 @@ function checkIfLost(player) {
     return true; 
   }
   return false;
-}
-
-function randomElement(array) {
-  return array[Math.floor(Math.random()*array.length)]
-}
-
-function randomWord() {
-  return randomElement(WORDS)
 }
 
 function newPlayer(socket) {
@@ -130,7 +119,7 @@ function numReadyPlayers(gameState) {
 }
 
 function checkForWinner(gameState) {
-  if(updatePlayersLeft(gameState) === PLAYERS_TO_WIN) {
+  if(updatePlayersLeft(gameState) <= PLAYERS_TO_WIN) {
     console.log("Reset game")
     gameState.loadTime = RESET_LENGTH
     console.log("reset length is " + RESET_LENGTH)
@@ -147,24 +136,38 @@ function checkForWinner(gameState) {
   }
 }
 
-var generateWords  = function (){
+function checkInput(word, player, id){
+  if(!word){
+    return
+  }
+
+  if(word.toLowerCase() === player.nextWords[0].toLowerCase()){
+    player.rightAnswers++
+    player.nextWords.shift()
+    target = findTarget(players, id)
+    if(players[target]){
+      players[target].nextWords.push(word)
+      players[target].lastAttacker = id
+    }
+  }
+  else {
+    player.wrongAnswers++
+    player.nextWords.shift()
+    player.nextWords.push(randomWord())
+    player.nextWords.push(randomWord())
+  }
+  player.prevWords.push(word)
+}
+
+var generateWords = function (){
   //generate words
   for (var id in gameState.players) {
     if (gameState.players[id] && gameState.state == 'INGAME' && 
       !gameState.players[id].won && !gameState.players[id].lost) {
-
       gameState.players[id].nextWords.push(randomWord());
-      //console.log(players[socket.id].nextWords);
-      gameState.players[id].lost = checkIfLost(gameState.players[id])
-      if (gameState.players[id].lost) {
-        gameState.players[id].deathTime = gameState.time
-        if (gameState.players[gameState.players[id].lastAttacker]) {
-          gameState.players[gameState.players[id].lastAttacker].kills++
-        }
-        checkForWinner(gameState)
-      }
     }
   }
+  
 
   if (gameState.delay > MS_PER_WORD_MIN) {
     gameState.delay -= MS_PER_WORD_DELTA
@@ -173,9 +176,28 @@ var generateWords  = function (){
   if (gameState.state === 'INGAME') {
     setTimeout(generateWords, gameState.delay)    
   }
-
 }
 
+function resetGame(gameState) {
+  console.log("Updating game state")
+  gameState.state = 'LOBBY'
+  gameState.playersLeft = 0
+  gameState.loadTime = COUNTDOWN_LENGTH
+  gameState.inCountdown = false
+  gameState.delay = MS_PER_WORD_BASE
+  gameState.playersNeeded = MIN_PLAYERS_TO_START
+
+  for (var id in gameState.players){
+    console.log(id)
+    var name = players[id].name
+    console.log(name)
+    players[id] = newPlayer()
+    players[id].name = name
+    if (name.length > 0 ){
+      players[id].ready = true
+    }
+  }
+}
 
 function updateGameState(gameState) {
   if (gameState.state === 'LOBBY') {
@@ -191,9 +213,9 @@ function updateGameState(gameState) {
         gameState.players[id].inGame = true
       }
     }
-  } else if (gameState.state === 'INGAME') {
+  } 
 
-
+  else if (gameState.state === 'INGAME') {
     if (gameState.loadTime >= 0) {
       gameState.loadTime -= 1000/60
     } else {
@@ -204,11 +226,24 @@ function updateGameState(gameState) {
         generateWords(gameState, 0)
       }
 
+      //check if players are dead
+      for (var id in gameState.players) {
+        var hadLost = gameState.players[id].lost
+        gameState.players[id].lost = checkIfLost(gameState.players[id])
+        if(gameState.players[id].lost){
+          gameState.players[id].deathTime = gameState.time
+          var killer = gameState.players[id].lastAttacker
+          if (!hadLost && gameState.players[killer]) {
+            gameState.players[killer].kills++
+          }
+        }
+      }
       gameState.playersLeft = updatePlayersLeft(gameState)
-      //console.log(gameState.playersLeft)
       checkForWinner(gameState)
     }
-  } else if (gameState.state === 'POSTGAME') {
+  }
+
+  else if (gameState.state === 'POSTGAME') {
     if (gameState.loadTime >= 0) {
       gameState.loadTime -= 1000/60
     }
@@ -220,9 +255,10 @@ function updateGameState(gameState) {
   }
 }
 
-var players = {};
+// Initialize the variables when we start the server
+
 var gameState = {
-  players : players,
+  players : {},
   state : 'LOBBY', // LOBBY, INGAME
   playersLeft : 0,
   loadTime: COUNTDOWN_LENGTH,
@@ -234,28 +270,30 @@ var gameState = {
   winner: '',
 };
 
+players = gameState.players
+
+// Respond to inputs
 io.on('connection', function(socket) {
   socket.on('new player', function() {
-    players[socket.id] = newPlayer(socket)
-  }); 
+    gameState.players[socket.id] = newPlayer(socket)
+  });
 
   socket.on('disconnect', function() {
     console.log('deleting '+socket.id)
-    var idToDelete = socket.id
-    delete players[socket.id]    
+    //var idToDelete = socket.id
+    delete gameState.players[socket.id]    
   });
 
   socket.on('name', function(data) {
     console.log('got name! '+data.word)
-    players[socket.id].name = data.word
-    players[socket.id].ready = true
+    gameState.players[socket.id].name = data.word
+    gameState.players[socket.id].ready = true
   })
 
   socket.on('start', function(data) {
     console.log("starting game")
     gameState.state = 'INGAME'
     gameState.inCountdown = true
-
     for (var id in gameState.players) {
       gameState.players[id].inGame = true
     }
@@ -263,53 +301,14 @@ io.on('connection', function(socket) {
 
   socket.on('input', function(data) {
     if (gameState.state == 'INGAME') {
-      var player = players[socket.id] || {};
-      player.lost = checkIfLost(player)
-      if (data.word) {
-        if (data.word.toLowerCase() === player.nextWords[0].toLowerCase()){
-          //console.log("Correct")
-          player.rightAnswers++
-          var word = player.nextWords.shift()
-
-          target = findTarget(players, socket.id)
-
-          if (players[target]) {
-            players[target].nextWords.push(word)
-            players[target].lastAttacker = socket.id
-            var hadLost = players[target].lost
-            players[target].lost = checkIfLost(player[target])
-            if (players[target].lost && !hadLost) {
-              gameState.players[target].deathTime = gameState.time
-              if(gameState.players[players[target].lastAttacker]) {
-                gameState.players[players[target].lastAttacker].kills++
-              }
-            }
-            checkForWinner(gameState)
-          }
-        }
-        else {
-          //console.log("Incorrect")
-          player.wrongAnswers++
-          player.nextWords.shift()
-          player.nextWords.push(randomWord())
-          player.nextWords.push(randomWord())
-          if (player.lost) {
-            gameState.players[id].deathTime = gameState.time
-            if(gameState.players[player.lastAttacker]) {
-              gameState.players[player.lastAttacker].kills++
-            }
-          }
-        }
-        player.prevWords.push(data.word);
+      var player = gameState.players[socket.id] || {};
+      checkInput(data.word, player, socket.id)
       }
-    }
   });
 });
 
+// Emit gamestate to players 
 setInterval(function() {
-  //console.log(gameState)
   updateGameState(gameState)
   io.sockets.emit('state', gameState);
-  //console.log(gameState.delay)
 }, 1000 / 60);
-
