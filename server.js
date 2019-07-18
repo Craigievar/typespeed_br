@@ -23,7 +23,7 @@ const http = require('http');
 const path = require('path');
 const socketIO = require('socket.io');
 const app = express();
-const server = http.Server(app);
+const server = http.Server(app); // eslint-disable-line new-cap
 const io = socketIO(server);
 app.set('port', 5000);
 app.use('/static', express.static(__dirname + '/static'));
@@ -41,6 +41,20 @@ server.listen(process.env.PORT || 5000, function() {
 // Add the WebSocket handlers
 io.on('connection', function(socket) {
 });
+
+// Initialize the game state when we start the server
+const gameState = {
+  players : {},
+  state : 'LOBBY', // LOBBY, INGAME
+  playersLeft : 0,
+  loadTime: COUNTDOWN_LENGTH,
+  inCountdown: false,
+  delay: MS_PER_WORD_BASE,
+  playersNeeded: MIN_PLAYERS_TO_START,
+  time: 0,
+  endTime: 0,
+  winner: ''
+};
 
 
 function randomElement(array) {
@@ -65,7 +79,7 @@ function newPlayer(socket) {
       lost: false,
       won: false,
       //target: findTarget(players, socket.id),
-      lobbyIndex: players.length, //TODO; DYNAMICALLY FETCH THIS
+      lobbyIndex: gameState.players.length, //TODO; DYNAMICALLY FETCH THIS
       inGame: false,
       ready: false,
       name: '',
@@ -79,12 +93,12 @@ function newPlayer(socket) {
 }
 
 function findTarget(players, player) {
-  var playerList = Object.keys(players);
-  var filtered = playerList.filter(function(value, index, arr){
-    return value != player && players[value].inGame && !players[value].won && !players[value].lost;
+  const playerList = Object.keys(players);
+  const filtered = playerList.filter(function(value, index, arr){
+    return value !== player && players[value].inGame && !players[value].won && !players[value].lost;
   });
   if (filtered.length > 0) {
-    var randomId = randomElement(filtered);
+    const randomId = randomElement(filtered);
     if(randomId) {
       return randomId;
     }
@@ -92,25 +106,25 @@ function findTarget(players, player) {
   return '';
 }
 
-function updatePlayersLeft(gameState) {
-  playersLeft = -1;
-  if (gameState && gameState.players) {
-    playersLeft += 1;
-    for (var id in gameState.players) {
-      if (!gameState.players[id].lost && gameState.players[id].inGame) {
-        playersLeft += 1;
+function updatePlayersLeft(game) {
+  game.playersLeft = -1;
+  if (game && game.players) {
+    game.playersLeft += 1;
+    for (const id in game.players) {
+      if (!game.players[id].lost && game.players[id].inGame) {
+        game.playersLeft += 1;
       }
     }
   }
-  return playersLeft;
+  return game.playersLeft;
 }
 
-function numReadyPlayers(gameState) {
-  playersReady = -1;
-  if (gameState && gameState.players) {
+function numReadyPlayers(game) {
+  let playersReady = -1;
+  if (game && game.players) {
     playersReady += 1;
-    for (var id in gameState.players) {
-      if (gameState.players[id].ready) {
+    for (const id in game.players) {
+      if (game.players[id].ready) {
         playersReady += 1;
       }
     }
@@ -118,19 +132,19 @@ function numReadyPlayers(gameState) {
   return playersReady;
 }
 
-function checkForWinner(gameState) {
-  if(updatePlayersLeft(gameState) <= PLAYERS_TO_WIN) {
+function checkForWinner(game) {
+  if(updatePlayersLeft(game) <= PLAYERS_TO_WIN) {
     console.log("Reset game");
-    gameState.loadTime = RESET_LENGTH;
+    game.loadTime = RESET_LENGTH;
     console.log("reset length is " + RESET_LENGTH);
-    gameState.state = 'POSTGAME';
-    if (gameState.endTime === 0) {
-      gameState.endTime = gameState.time;
+    game.state = 'POSTGAME';
+    if (game.endTime === 0) {
+      game.endTime = game.time;
     }
-    for (id in gameState.players) {
-      if (gameState.players[id] && !gameState.players[id].lost){
-        gameState.players[id].won = true;
-        gameState.winner = id;
+    for (const player of game.players) {
+      if (player && !player.lost){
+        player.won = true;
+        game.winner = player.id;
       }
     }
   }
@@ -144,10 +158,10 @@ function checkInput(word, player, id){
   if(word.toLowerCase() === player.nextWords[0].toLowerCase()){
     player.rightAnswers++;
     player.nextWords.shift();
-    target = findTarget(players, id);
-    if(players[target]){
-      players[target].nextWords.push(word);
-      players[target].lastAttacker = id;
+    const target = findTarget(gameState.players, id);
+    if(gameState.players[target]){
+      gameState.players[target].nextWords.push(word);
+      gameState.players[target].lastAttacker = id;
     }
   }
   else {
@@ -159,12 +173,12 @@ function checkInput(word, player, id){
   player.prevWords.push(word);
 }
 
-var generateWords = function (){
+const generateWords = function (){
   //generate words
-  for (var id in gameState.players) {
-    if (gameState.players[id] && gameState.state == 'INGAME' &&
-      !gameState.players[id].won && !gameState.players[id].lost) {
-      gameState.players[id].nextWords.push(randomWord());
+  for (const player of gameState.players) {
+    if (player && gameState.state === 'INGAME' &&
+      !player.won && !player.lost) {
+      player.nextWords.push(randomWord());
     }
   }
 
@@ -178,99 +192,80 @@ var generateWords = function (){
   }
 };
 
-function resetGame(gameState) {
+function resetGame(game) {
   console.log("Updating game state");
-  gameState.state = 'LOBBY';
-  gameState.playersLeft = 0;
-  gameState.loadTime = COUNTDOWN_LENGTH;
-  gameState.inCountdown = false;
-  gameState.delay = MS_PER_WORD_BASE;
-  gameState.playersNeeded = MIN_PLAYERS_TO_START;
+  game.state = 'LOBBY';
+  game.playersLeft = 0;
+  game.loadTime = COUNTDOWN_LENGTH;
+  game.inCountdown = false;
+  game.delay = MS_PER_WORD_BASE;
+  game.playersNeeded = MIN_PLAYERS_TO_START;
 
-  for (var id in gameState.players){
-    console.log(id);
-    var name = players[id].name;
-    console.log(name);
-    players[id] = newPlayer();
-    players[id].name = name;
-    if (name.length > 0 ){
-      players[id].ready = true;
+  for (const {name, id} of game.players){
+    game.players[id] = newPlayer();
+    game.players[id].name = name;
+
+    if (name.length > 0) {
+      game.players[id].ready = true;
     }
   }
 }
 
-function updateGameState(gameState) {
-  if (gameState.state === 'LOBBY') {
-    var playersReady = numReadyPlayers(gameState);
-    gameState.playersNeeded = MIN_PLAYERS_TO_START - playersReady;
+function updateGameState(game) {
+  if (game.state === 'LOBBY') {
+    const playersReady = numReadyPlayers(game);
+    game.playersNeeded = MIN_PLAYERS_TO_START - playersReady;
     if (playersReady >= MIN_PLAYERS_TO_START) {
       //start game!
       console.log("starting game");
-      gameState.state = 'INGAME';
-      gameState.inCountdown = true;
+      game.state = 'INGAME';
+      game.inCountdown = true;
 
-      for (var id in gameState.players) {
-        gameState.players[id].inGame = true;
+      for (const player of game.players) {
+        player.inGame = true;
       }
     }
   }
 
-  else if (gameState.state === 'INGAME') {
-    if (gameState.loadTime >= 0) {
-      gameState.loadTime -= 1000 / 60;
+  else if (game.state === 'INGAME') {
+    if (game.loadTime >= 0) {
+      game.loadTime -= 1000 / 60;
     } else {
-      gameState.time += 1000 / 60;
-      if (gameState.inCountdown) {
-        gameState.inCountdown = false;
+      game.time += 1000 / 60;
+      if (game.inCountdown) {
+        game.inCountdown = false;
         // kick off word generation
-        generateWords(gameState, 0);
+        generateWords(game, 0);
       }
 
       //check if players are dead
-      for (var id in gameState.players) {
-        var hadLost = gameState.players[id].lost;
-        gameState.players[id].lost = checkIfLost(gameState.players[id]);
-        if(gameState.players[id].lost){
-          gameState.players[id].deathTime = gameState.time;
-          var killer = gameState.players[id].lastAttacker;
-          if (!hadLost && gameState.players[killer]) {
-            gameState.players[killer].kills++;
+      for (const player of game.players) {
+        const hadLost = player.lost;
+        player.lost = checkIfLost(player);
+        if(player.lost){
+          player.deathTime = game.time;
+          const killer = player.lastAttacker;
+          if (!hadLost && game.players[killer]) {
+            game.players[killer].kills++;
           }
         }
       }
-      gameState.playersLeft = updatePlayersLeft(gameState);
-      checkForWinner(gameState);
+      game.playersLeft = updatePlayersLeft(game);
+      checkForWinner(game);
     }
   }
 
-  else if (gameState.state === 'POSTGAME') {
-    if (gameState.loadTime >= 0) {
-      gameState.loadTime -= 1000 / 60;
+  else if (game.state === 'POSTGAME') {
+    if (game.loadTime >= 0) {
+      game.loadTime -= 1000 / 60;
     }
     else {
-      console.log(gameState.state);
-      console.log(gameState.loadTime);
-      resetGame(gameState);
+      console.log(game.state);
+      console.log(game.loadTime);
+      resetGame(game);
     }
   }
 }
-
-// Initialize the variables when we start the server
-
-var gameState = {
-  players : {},
-  state : 'LOBBY', // LOBBY, INGAME
-  playersLeft : 0,
-  loadTime: COUNTDOWN_LENGTH,
-  inCountdown: false,
-  delay: MS_PER_WORD_BASE,
-  playersNeeded: MIN_PLAYERS_TO_START,
-  time: 0,
-  endTime: 0,
-  winner: ''
-};
-
-players = gameState.players;
 
 // Respond to inputs
 io.on('connection', function(socket) {
@@ -280,7 +275,7 @@ io.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log('deleting ' + socket.id);
-    //var idToDelete = socket.id
+    //let idToDelete = socket.id
     delete gameState.players[socket.id];
   });
 
@@ -294,14 +289,14 @@ io.on('connection', function(socket) {
     console.log("starting game");
     gameState.state = 'INGAME';
     gameState.inCountdown = true;
-    for (var id in gameState.players) {
-      gameState.players[id].inGame = true;
+    for (const player of gameState.players) {
+      player.inGame = true;
     }
   });
 
   socket.on('input', function(data) {
-    if (gameState.state == 'INGAME') {
-      var player = gameState.players[socket.id] || {};
+    if (gameState.state === 'INGAME') {
+      const player = gameState.players[socket.id] || {};
       checkInput(data.word, player, socket.id);
       }
   });
