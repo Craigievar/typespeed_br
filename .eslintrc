@@ -9,7 +9,8 @@
         "sourceType" : "script"
     },
     "globals": {
-      "document": false
+      "document": false,
+      "io": false
     },
     "rules": {
         // possible errors

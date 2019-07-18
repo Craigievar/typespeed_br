@@ -4,7 +4,7 @@
 */
 
 // Unpack config file
-const config = require('config');
+const config = require('./config');
 const WORDS = config.WORDS;
 const MS_PER_WORD_BASE = config.MS_PER_WORD_BASE;
 const MS_PER_WORD_MIN = config.MS_PER_WORD_MIN;
@@ -70,7 +70,7 @@ function checkIfLost(player) {
   return false;
 }
 
-function newPlayer(socket) {
+function newPlayer(id) {
   return {
     prevWords: [],
     nextWords: [],
@@ -79,6 +79,7 @@ function newPlayer(socket) {
     //target: findTarget(players, socket.id),
     lobbyIndex: gameState.players.length, //TODO; DYNAMICALLY FETCH THIS
     inGame: false,
+    id,
     ready: false,
     name: '',
     kills: 0,
@@ -145,7 +146,7 @@ function checkForWinner(game) {
     if (game.endTime === 0) {
       game.endTime = game.time;
     }
-    for (const player of game.players) {
+    for (const player of Object.values(game.players)) {
       if (player && !player.lost) {
         player.won = true;
         game.winner = player.id;
@@ -178,7 +179,7 @@ function checkInput(word, player, id) {
 
 function generateWords() {
   //generate words
-  for (const player of gameState.players) {
+  for (const player of Object.values(gameState.players)) {
     if (player && gameState.state === 'INGAME' && !player.won && !player.lost) {
       player.nextWords.push(randomWord());
     }
@@ -202,8 +203,8 @@ function resetGame(game) {
   game.delay = MS_PER_WORD_BASE;
   game.playersNeeded = MIN_PLAYERS_TO_START;
 
-  for (const { name, id } of game.players) {
-    game.players[id] = newPlayer();
+  for (const { name, id } of Object.values(game.players)) {
+    game.players[id] = newPlayer(id);
     game.players[id].name = name;
 
     if (name.length > 0) {
@@ -222,7 +223,7 @@ function updateGameState(game) {
       game.state = 'INGAME';
       game.inCountdown = true;
 
-      for (const player of game.players) {
+      for (const player of Object.values(game.players)) {
         player.inGame = true;
       }
     }
@@ -238,7 +239,7 @@ function updateGameState(game) {
       }
 
       //check if players are dead
-      for (const player of game.players) {
+      for (const player of Object.values(game.players)) {
         const hadLost = player.lost;
         player.lost = checkIfLost(player);
         if (player.lost) {
@@ -266,7 +267,7 @@ function updateGameState(game) {
 // Respond to inputs
 io.on('connection', function(socket) {
   socket.on('new player', function() {
-    gameState.players[socket.id] = newPlayer(socket);
+    gameState.players[socket.id] = newPlayer(socket.id);
   });
 
   socket.on('disconnect', function() {
@@ -285,7 +286,8 @@ io.on('connection', function(socket) {
     console.log('starting game');
     gameState.state = 'INGAME';
     gameState.inCountdown = true;
-    for (const player of gameState.players) {
+    console.log('players: ', gameState.players);
+    for (const player of Object.values(gameState.players)) {
       player.inGame = true;
     }
   });
