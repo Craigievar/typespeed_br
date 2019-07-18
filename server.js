@@ -1,30 +1,30 @@
 /*
-  Basically, we want to refactor win checks, etc. 
+  Basically, we want to refactor win checks, etc.
   out of player actions (just update to track state there)
 */
 
 // Unpack config file
-var config = require('config');
-let WORDS = config.WORDS
-let MS_PER_WORD_BASE = config.MS_PER_WORD_BASE
-let MS_PER_WORD_MIN = config.MS_PER_WORD_MIN
-let MS_PER_WORD_DELTA = config.MS_PER_WORD_DELTA
-let WORDS_TO_LOSE = config.WORDS_TO_LOSE
-let MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START
-let COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH
-let RESET_LENGTH = config.RESET_LENGTH
-let PLAYERS_TO_WIN = config.PLAYERS_TO_WIN
-console.log(RESET_LENGTH)
-console.log(PLAYERS_TO_WIN)
+const config = require('config');
+const WORDS = config.WORDS;
+const MS_PER_WORD_BASE = config.MS_PER_WORD_BASE;
+const MS_PER_WORD_MIN = config.MS_PER_WORD_MIN;
+const MS_PER_WORD_DELTA = config.MS_PER_WORD_DELTA;
+const WORDS_TO_LOSE = config.WORDS_TO_LOSE;
+const MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START;
+const COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH;
+const RESET_LENGTH = config.RESET_LENGTH;
+const PLAYERS_TO_WIN = config.PLAYERS_TO_WIN;
+console.log(RESET_LENGTH);
+console.log(PLAYERS_TO_WIN);
 
 // Dependencies
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var socketIO = require('socket.io');
-var app = express();
-var server = http.Server(app);
-var io = socketIO(server);
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const socketIO = require('socket.io');
+const app = express();
+const server = http.Server(app);
+const io = socketIO(server);
 app.set('port', 5000);
 app.use('/static', express.static(__dirname + '/static'));
 
@@ -42,18 +42,18 @@ server.listen(process.env.PORT || 5000, function() {
 io.on('connection', function(socket) {
 });
 
- 
+
 function randomElement(array) {
-  return array[Math.floor(Math.random()*array.length)]
+  return array[Math.floor(Math.random() * array.length)];
 }
 
 function randomWord() {
-  return randomElement(WORDS)
+  return randomElement(WORDS);
 }
 
 function checkIfLost(player) {
   if (player && player.nextWords.length >= WORDS_TO_LOSE) {
-    return true; 
+    return true;
   }
   return false;
 }
@@ -74,63 +74,63 @@ function newPlayer(socket) {
       rightAnswers: 0,
       lastAttacker: '',
       winner: '',
-      deathTime: 1,
-    } 
+      deathTime: 1
+    };
 }
 
 function findTarget(players, player) {
-  var playerList = Object.keys(players)
+  var playerList = Object.keys(players);
   var filtered = playerList.filter(function(value, index, arr){
-    return value != player && players[value].inGame && !players[value].won && !players[value].lost
+    return value != player && players[value].inGame && !players[value].won && !players[value].lost;
   });
   if (filtered.length > 0) {
-    var randomId = randomElement(filtered)
+    var randomId = randomElement(filtered);
     if(randomId) {
-      return randomId
+      return randomId;
     }
   }
-  return ''
+  return '';
 }
 
 function updatePlayersLeft(gameState) {
-  playersLeft = -1
+  playersLeft = -1;
   if (gameState && gameState.players) {
-    playersLeft += 1
+    playersLeft += 1;
     for (var id in gameState.players) {
       if (!gameState.players[id].lost && gameState.players[id].inGame) {
-        playersLeft += 1
+        playersLeft += 1;
       }
     }
   }
-  return playersLeft
+  return playersLeft;
 }
 
 function numReadyPlayers(gameState) {
-  playersReady = -1
+  playersReady = -1;
   if (gameState && gameState.players) {
-    playersReady += 1
+    playersReady += 1;
     for (var id in gameState.players) {
       if (gameState.players[id].ready) {
-        playersReady += 1
+        playersReady += 1;
       }
     }
   }
-  return playersReady
+  return playersReady;
 }
 
 function checkForWinner(gameState) {
   if(updatePlayersLeft(gameState) <= PLAYERS_TO_WIN) {
-    console.log("Reset game")
-    gameState.loadTime = RESET_LENGTH
-    console.log("reset length is " + RESET_LENGTH)
-    gameState.state = 'POSTGAME'
+    console.log("Reset game");
+    gameState.loadTime = RESET_LENGTH;
+    console.log("reset length is " + RESET_LENGTH);
+    gameState.state = 'POSTGAME';
     if (gameState.endTime === 0) {
-      gameState.endTime = gameState.time
+      gameState.endTime = gameState.time;
     }
     for (id in gameState.players) {
       if (gameState.players[id] && !gameState.players[id].lost){
-        gameState.players[id].won = true
-        gameState.winner = id
+        gameState.players[id].won = true;
+        gameState.winner = id;
       }
     }
   }
@@ -138,119 +138,119 @@ function checkForWinner(gameState) {
 
 function checkInput(word, player, id){
   if(!word){
-    return
+    return;
   }
 
   if(word.toLowerCase() === player.nextWords[0].toLowerCase()){
-    player.rightAnswers++
-    player.nextWords.shift()
-    target = findTarget(players, id)
+    player.rightAnswers++;
+    player.nextWords.shift();
+    target = findTarget(players, id);
     if(players[target]){
-      players[target].nextWords.push(word)
-      players[target].lastAttacker = id
+      players[target].nextWords.push(word);
+      players[target].lastAttacker = id;
     }
   }
   else {
-    player.wrongAnswers++
-    player.nextWords.shift()
-    player.nextWords.push(randomWord())
-    player.nextWords.push(randomWord())
+    player.wrongAnswers++;
+    player.nextWords.shift();
+    player.nextWords.push(randomWord());
+    player.nextWords.push(randomWord());
   }
-  player.prevWords.push(word)
+  player.prevWords.push(word);
 }
 
 var generateWords = function (){
   //generate words
   for (var id in gameState.players) {
-    if (gameState.players[id] && gameState.state == 'INGAME' && 
+    if (gameState.players[id] && gameState.state == 'INGAME' &&
       !gameState.players[id].won && !gameState.players[id].lost) {
       gameState.players[id].nextWords.push(randomWord());
     }
   }
-  
+
 
   if (gameState.delay > MS_PER_WORD_MIN) {
-    gameState.delay -= MS_PER_WORD_DELTA
+    gameState.delay -= MS_PER_WORD_DELTA;
   }
-  
+
   if (gameState.state === 'INGAME') {
-    setTimeout(generateWords, gameState.delay)    
+    setTimeout(generateWords, gameState.delay);
   }
-}
+};
 
 function resetGame(gameState) {
-  console.log("Updating game state")
-  gameState.state = 'LOBBY'
-  gameState.playersLeft = 0
-  gameState.loadTime = COUNTDOWN_LENGTH
-  gameState.inCountdown = false
-  gameState.delay = MS_PER_WORD_BASE
-  gameState.playersNeeded = MIN_PLAYERS_TO_START
+  console.log("Updating game state");
+  gameState.state = 'LOBBY';
+  gameState.playersLeft = 0;
+  gameState.loadTime = COUNTDOWN_LENGTH;
+  gameState.inCountdown = false;
+  gameState.delay = MS_PER_WORD_BASE;
+  gameState.playersNeeded = MIN_PLAYERS_TO_START;
 
   for (var id in gameState.players){
-    console.log(id)
-    var name = players[id].name
-    console.log(name)
-    players[id] = newPlayer()
-    players[id].name = name
+    console.log(id);
+    var name = players[id].name;
+    console.log(name);
+    players[id] = newPlayer();
+    players[id].name = name;
     if (name.length > 0 ){
-      players[id].ready = true
+      players[id].ready = true;
     }
   }
 }
 
 function updateGameState(gameState) {
   if (gameState.state === 'LOBBY') {
-    var playersReady = numReadyPlayers(gameState)
-    gameState.playersNeeded = MIN_PLAYERS_TO_START - playersReady
+    var playersReady = numReadyPlayers(gameState);
+    gameState.playersNeeded = MIN_PLAYERS_TO_START - playersReady;
     if (playersReady >= MIN_PLAYERS_TO_START) {
       //start game!
-      console.log("starting game")
-      gameState.state = 'INGAME'
-      gameState.inCountdown = true
-  
+      console.log("starting game");
+      gameState.state = 'INGAME';
+      gameState.inCountdown = true;
+
       for (var id in gameState.players) {
-        gameState.players[id].inGame = true
+        gameState.players[id].inGame = true;
       }
     }
-  } 
+  }
 
   else if (gameState.state === 'INGAME') {
     if (gameState.loadTime >= 0) {
-      gameState.loadTime -= 1000/60
+      gameState.loadTime -= 1000 / 60;
     } else {
-      gameState.time += 1000/60
+      gameState.time += 1000 / 60;
       if (gameState.inCountdown) {
-        gameState.inCountdown = false 
+        gameState.inCountdown = false;
         // kick off word generation
-        generateWords(gameState, 0)
+        generateWords(gameState, 0);
       }
 
       //check if players are dead
       for (var id in gameState.players) {
-        var hadLost = gameState.players[id].lost
-        gameState.players[id].lost = checkIfLost(gameState.players[id])
+        var hadLost = gameState.players[id].lost;
+        gameState.players[id].lost = checkIfLost(gameState.players[id]);
         if(gameState.players[id].lost){
-          gameState.players[id].deathTime = gameState.time
-          var killer = gameState.players[id].lastAttacker
+          gameState.players[id].deathTime = gameState.time;
+          var killer = gameState.players[id].lastAttacker;
           if (!hadLost && gameState.players[killer]) {
-            gameState.players[killer].kills++
+            gameState.players[killer].kills++;
           }
         }
       }
-      gameState.playersLeft = updatePlayersLeft(gameState)
-      checkForWinner(gameState)
+      gameState.playersLeft = updatePlayersLeft(gameState);
+      checkForWinner(gameState);
     }
   }
 
   else if (gameState.state === 'POSTGAME') {
     if (gameState.loadTime >= 0) {
-      gameState.loadTime -= 1000/60
+      gameState.loadTime -= 1000 / 60;
     }
     else {
-      console.log(gameState.state)
-      console.log(gameState.loadTime)
-      resetGame(gameState)
+      console.log(gameState.state);
+      console.log(gameState.loadTime);
+      resetGame(gameState);
     }
   }
 }
@@ -267,48 +267,48 @@ var gameState = {
   playersNeeded: MIN_PLAYERS_TO_START,
   time: 0,
   endTime: 0,
-  winner: '',
+  winner: ''
 };
 
-players = gameState.players
+players = gameState.players;
 
 // Respond to inputs
 io.on('connection', function(socket) {
   socket.on('new player', function() {
-    gameState.players[socket.id] = newPlayer(socket)
+    gameState.players[socket.id] = newPlayer(socket);
   });
 
   socket.on('disconnect', function() {
-    console.log('deleting '+socket.id)
+    console.log('deleting ' + socket.id);
     //var idToDelete = socket.id
-    delete gameState.players[socket.id]    
+    delete gameState.players[socket.id];
   });
 
   socket.on('name', function(data) {
-    console.log('got name! '+data.word)
-    gameState.players[socket.id].name = data.word
-    gameState.players[socket.id].ready = true
-  })
+    console.log('got name! ' + data.word);
+    gameState.players[socket.id].name = data.word;
+    gameState.players[socket.id].ready = true;
+  });
 
   socket.on('start', function(data) {
-    console.log("starting game")
-    gameState.state = 'INGAME'
-    gameState.inCountdown = true
+    console.log("starting game");
+    gameState.state = 'INGAME';
+    gameState.inCountdown = true;
     for (var id in gameState.players) {
-      gameState.players[id].inGame = true
+      gameState.players[id].inGame = true;
     }
-  })
+  });
 
   socket.on('input', function(data) {
     if (gameState.state == 'INGAME') {
       var player = gameState.players[socket.id] || {};
-      checkInput(data.word, player, socket.id)
+      checkInput(data.word, player, socket.id);
       }
   });
 });
 
-// Emit gamestate to players 
+// Emit gamestate to players
 setInterval(function() {
-  updateGameState(gameState)
+  updateGameState(gameState);
   io.sockets.emit('state', gameState);
 }, 1000 / 60);
