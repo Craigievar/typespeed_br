@@ -92,20 +92,21 @@ function newPlayer(socket) {
 
 function findTarget(players, player) {
   const playerList = Object.keys(players);
-  const filtered = playerList.filter(function(value, index, arr) {
-    return (
+  const filtered = playerList.filter(
+    value =>
       value !== player &&
       players[value].inGame &&
       !players[value].won &&
       !players[value].lost
-    );
-  });
+  );
+
   if (filtered.length > 0) {
     const randomId = randomElement(filtered);
     if (randomId) {
       return randomId;
     }
   }
+
   return '';
 }
 
@@ -175,7 +176,7 @@ function checkInput(word, player, id) {
   player.prevWords.push(word);
 }
 
-const generateWords = function() {
+function generateWords() {
   //generate words
   for (const player of gameState.players) {
     if (player && gameState.state === 'INGAME' && !player.won && !player.lost) {
@@ -190,7 +191,7 @@ const generateWords = function() {
   if (gameState.state === 'INGAME') {
     setTimeout(generateWords, gameState.delay);
   }
-};
+}
 
 function resetGame(game) {
   console.log('Updating game state');

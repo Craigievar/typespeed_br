@@ -8,6 +8,9 @@
     "parserOptions" : {
         "sourceType" : "script"
     },
+    "globals": {
+      "document": false
+    },
     "rules": {
         // possible errors
         "comma-dangle": [ 0 ],
