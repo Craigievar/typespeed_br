@@ -20,18 +20,11 @@ console.log(PLAYERS_TO_WIN);
 // Dependencies
 const express = require('express');
 const http = require('http');
-const path = require('path');
 const socketIO = require('socket.io');
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
 const io = socketIO(server);
 app.set('port', 5000);
-app.use('/static', express.static(__dirname + '/static'));
-
-// Route requests
-app.get('/', function(request, response) {
-  response.sendFile(path.join(__dirname, 'index.html'));
-});
 
 // Start the server.
 server.listen(process.env.PORT || 5000, function() {

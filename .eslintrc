@@ -6,11 +6,11 @@
     },
     "parser": "babel-eslint",
     "parserOptions" : {
-        "sourceType" : "script"
+        "sourceType" : "module"
     },
     "globals": {
       "document": false,
-      "io": false
+      "window": false,
     },
     "rules": {
         // possible errors
