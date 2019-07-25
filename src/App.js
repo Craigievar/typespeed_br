@@ -4,6 +4,30 @@ import React from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
+type PlayerID = string;
+type Player = {
+  name: string,
+  inGame: boolean,
+  lost: boolean,
+  lastAttacker: PlayerID,
+  deathTime: number,
+  won: boolean,
+  nextWords: Array<string>,
+  kills: number,
+  rightAnswers: number,
+  wrongAnswers: number,
+};
+type GameView = 'INGAME' | 'POSTGAME' | 'LOBBY';
+
+type GameState = {
+  players: {[PlayerID]: Player},
+  playersNeeded: number,
+  state: GameView,
+  playersLeft: number,
+  endTime: number,
+  loadTime: number,
+};
+
 function App() {
   React.useEffect(() => {
     const WORDS_TO_LOSE = 10;
@@ -29,11 +53,11 @@ function App() {
       socket.emit('start', {});
     };
 
-    function isLetter(str) {
+    function isLetter(str: string) {
       return str.length === 1 && str.match(/[a-z]/i);
     }
 
-    function renderEndGame(gameState) {
+    function renderEndGame(gameState: GameState) {
       //console.log('rendering endgame')
       const players = gameState.players;
       const player = players[socket.io.engine.id];
@@ -139,7 +163,7 @@ function App() {
       ctx.restore();
     }
 
-    function renderInGame(gameState) {
+    function renderInGame(gameState: GameState) {
       //console.log('rendering game')
       //console.log('rendering game')
       const players = gameState.players;
@@ -224,7 +248,7 @@ function App() {
       }
     }
 
-    function renderGetName(players) {
+    function renderGetName(players: {[PlayerID]: Player}) {
       //console.log('rendering name')
       const canvas = document.getElementById('canvas');
 
@@ -255,7 +279,7 @@ function App() {
       }
     }
 
-    function renderLobby(gameState) {
+    function renderLobby(gameState: GameState) {
       //console.log('rendering lobby')
       const canvas = document.getElementById('canvas');
       canvas.width = canvasWidth;
@@ -315,7 +339,7 @@ function App() {
       ctx.restore();
     }
 
-    document.addEventListener('keyup', function(event) {
+    document.addEventListener('keyup', function(event: KeyboardEvent) {
       if (isLetter(String.fromCharCode(event.keyCode))) {
         local.currString += String.fromCharCode(event.keyCode).toLowerCase();
         //console.log(local.currString)
@@ -359,7 +383,7 @@ function App() {
 
     socket.emit('new player');
 
-    socket.on('state', function(gameState) {
+    socket.on('state', function(gameState: GameState) {
       //console.log(gameState)
       local.gameState = gameState;
       //console.log(gameState.state)
