@@ -4,6 +4,7 @@ import type GameNetwork from './network/GameNetwork';
 import type {GameState} from './gameTypes';
 
 import React from 'react';
+import AnimatedText from './animations/AnimatedText';
 import './LobbyView.css';
 
 const {useState} = React;
@@ -36,7 +37,7 @@ function LobbyView({gameServer, gameState}: Props) {
         </>
       )}
       {isWaiting && (
-        <div class="LobbyView-Waiting">Waiting for {gameState.playersNeeded} more players</div>
+        <div class="LobbyView-Waiting"><AnimatedText animation="pulse">Waiting for {gameState.playersNeeded} more players</AnimatedText></div>
       )}
     </div>
   );
