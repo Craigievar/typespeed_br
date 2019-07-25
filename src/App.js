@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 import io from 'socket.io-client';
 import './App.css';

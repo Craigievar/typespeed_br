@@ -23,6 +23,7 @@
     "node": "11.11.0"
   },
   "devDependencies": {
+    "flow-bin": "^0.103.0",
     "prettier": "^1.18.2"
   },
   "browserslist": {
