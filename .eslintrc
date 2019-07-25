@@ -97,7 +97,7 @@
         "no-undef": [ 0 ],
         "no-undef-init": [ 2 ],
         "no-undefined": [ 0 ],
-        "no-unused-vars": [ 2, { "vars": "all", "args": "none" } ],
+        "no-unused-vars": [ 0, { "vars": "all", "args": "none" } ],
         "no-use-before-define": [ 2, "nofunc" ],
 
         // node.js
