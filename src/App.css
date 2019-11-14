@@ -32,6 +32,14 @@
   position: relative;
 }
 
+.App-FreezeStateBtn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 12px;
+  font-size: 18px;
+}
+
 
 #canvas {
   position: absolute;

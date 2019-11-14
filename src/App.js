@@ -34,13 +34,18 @@ const GameViewRenderers: { [GameView]: Function } = {
 
 function App() {
   const [gameState, setGameState] = useState(UNCONNECTED_GAME_STATE);
+  const [isReceivingGameState, setIsReceivingGameState] = useState(true);
   const gameServer = useGameServer('localhost:5000');
 
   useEffect(() => {
-    gameServer.onStateUpdate(updatedGameState => {
-      setGameState(updatedGameState);
+    const unsub = gameServer.onStateUpdate(updatedGameState => {
+      if (isReceivingGameState) {
+        setGameState(updatedGameState);
+      }
     });
-  }, []);
+
+    return () => unsub();
+  }, [isReceivingGameState, gameServer]);
 
   const player = gameServer.isConnected()
     ? gameState.players[gameServer.getSocketID()]
@@ -56,6 +61,12 @@ function App() {
         <View gameServer={gameServer} gameState={gameState} />
       </div>
       <canvas id="canvas" />
+      <button
+        className="App-FreezeStateBtn"
+        onClick={() => setIsReceivingGameState(!isReceivingGameState)}
+      >
+        [Debug] {isReceivingGameState ? 'FREEZE' : 'UNFREEZE'}
+      </button>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import type {GameState, PlayerID} from '../gameTypes';
 
 import io from 'socket.io-client';
+import uuid from 'tiny-uuid';
 
 type Socket = {
   emit: (string, Object) => void,
@@ -20,7 +21,11 @@ function nullthrows<T>(obj: ?T): T {
 
 class GameNetwork {
   _socket: ?Socket;
-  _listeners = {};
+  _listeners: {[string]: Function} = {};
+
+  _onChange = (gameState: GameState) => {
+    Object.values(this._listeners).forEach(listener => listener(gameState));
+  }
 
   isConnected(): boolean {
     return this._socket !== undefined;
@@ -35,8 +40,12 @@ class GameNetwork {
       return;
     }
 
-    this._socket = io(address);
-    this._socket.emit('new player');
+    const socket: ?Socket = io(address);
+    if (socket) {
+      this._socket = socket;
+      socket.emit('new player');
+      socket.on('state', this._onChange);
+    }
   }
 
   startGame() {
@@ -52,7 +61,12 @@ class GameNetwork {
   }
 
   onStateUpdate(onChange: (gameState: GameState) => void) {
-    return nullthrows(this._socket).on('state', onChange);
+    const id = uuid();
+    this._listeners[id] = onChange;
+
+    return () => {
+      delete this._listeners[id];
+    };
   }
 }
 
