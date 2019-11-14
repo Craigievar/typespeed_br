@@ -12,7 +12,7 @@ const {useState} = React;
 type Props = {
   gameServer: GameNetwork,
   gameState: GameState,
-}
+};
 
 function LobbyView({gameServer, gameState}: Props) {
   const [playerName, setPlayerName] = useState('');

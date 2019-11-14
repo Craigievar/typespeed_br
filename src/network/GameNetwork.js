@@ -1,12 +1,13 @@
 // @flow
 
-import type {GameState} from '../gameTypes';
+import type {GameState, PlayerID} from '../gameTypes';
 
 import io from 'socket.io-client';
 
 type Socket = {
   emit: (string, Object) => void,
   on: (string, (any) => void) => void,
+  io: {engine: {id: PlayerID}}
 };
 
 function nullthrows<T>(obj: ?T): T {
@@ -20,6 +21,10 @@ function nullthrows<T>(obj: ?T): T {
 class GameNetwork {
   _socket: ?Socket;
   _listeners = {};
+
+  getSocketID(): PlayerID {
+    return nullthrows(this._socket).io.engine.id;
+  }
 
   connectToAddress(address: string) {
     if (this._socket) {
