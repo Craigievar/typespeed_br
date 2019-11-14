@@ -1,6 +1,6 @@
 // @flow
 
-import type {PlayerID, Player, GameView, GameState} from './gameTypes';
+import type { PlayerID, Player, GameView, GameState } from './gameTypes';
 
 import React from 'react';
 import io from 'socket.io-client';
@@ -11,7 +11,7 @@ import LobbyView from './LobbyView';
 import IngameView from './IngameView';
 import useGameServer from './network/useGameServer';
 
-const {useEffect, useState} = React;
+const { useEffect, useState } = React;
 
 const UNCONNECTED_GAME_STATE = {
   players: {},
@@ -22,11 +22,14 @@ const UNCONNECTED_GAME_STATE = {
   loadTime: 0,
 };
 
-const GameViewRenderers: {[GameView]: Function} = {
-  UNCONNECTED: UnconnectedView,
-  POSTGAME: PostGameView,
-  LOBBY: LobbyView,
-  INGAME: IngameView
+const GameViewRenderers: { [GameView]: Function } = {
+  UNCONNECTED: (player: ?Player) => UnconnectedView,
+  POSTGAME: (player: ?Player) => PostGameView,
+  LOBBY: (player: ?Player) => LobbyView,
+  INGAME: (player: ?Player) =>
+    player && ((player.inGame && (player.lost || player.won)) || !player.inGame)
+      ? PostGameView
+      : IngameView,
 };
 
 function App() {
@@ -39,7 +42,10 @@ function App() {
     });
   }, []);
 
-  const View = GameViewRenderers[gameState.state];
+  const player = gameServer.isConnected()
+    ? gameState.players[gameServer.getSocketID()]
+    : null;
+  const View = GameViewRenderers[gameState.state](player);
 
   return (
     <div className="App">

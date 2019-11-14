@@ -22,6 +22,10 @@ class GameNetwork {
   _socket: ?Socket;
   _listeners = {};
 
+  isConnected(): boolean {
+    return this._socket !== undefined;
+  }
+
   getSocketID(): PlayerID {
     return nullthrows(this._socket).io.engine.id;
   }
