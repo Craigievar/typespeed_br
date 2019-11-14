@@ -66,12 +66,12 @@ function IngameView({ gameServer, gameState }: Props) {
           </div>
           <div>{player.nextWords.join(' ')}</div>
           <div>
-            {'Words in Queue: ' + player.nextWords.length + '/' + WORDS_TO_LOSE}
+            Words in Queue: {player.nextWords.length}/{WORDS_TO_LOSE}
           </div>
-          <div>{'Players Left: ' + gameState.playersLeft}</div>
-          <div>{'KOs: ' + player.kills}</div>
-          <div>{'Words: ' + player.rightAnswers}</div>
-          <div>{'Mistakes: ' + player.wrongAnswers}</div>
+          <div>Players Left: {gameState.playersLeft}</div>
+          <div>KOs: {player.kills}</div>
+          <div>Words: {player.rightAnswers}</div>
+          <div>Mistakes: {player.wrongAnswers}</div>
         </>
       )}
     </div>

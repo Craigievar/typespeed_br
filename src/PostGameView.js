@@ -17,37 +17,34 @@ function PostGameView({ gameServer, gameState }: Props) {
     <div>
       {player && !player.inGame && (
         <>
-          <div>{'In game with ' + gameState.playersLeft + ' players left'}</div>
-          <div>{'Next Game Starts In ' + Math.floor(gameState.loadTime / 1000)}</div>
+          <div>In game with {gameState.playersLeft} players left}</div>
+          <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>
         </>
       )}
       {player && player.lost && (
         <>
-          {player.lastAttacker && player.lastAttacker.length > 0 && (<div>{'Killed by ' + gameState.players[player.lastAttacker].name}</div>)}
-          {!(player.lastAttacker && player.lastAttacker.length > 0) && (<div>{'You Lose :('}</div>)}
+          {player.lastAttacker && player.lastAttacker.length > 0 && (
+            <div>Killed by {gameState.players[player.lastAttacker].name}</div>
+          )}
+          {!(player.lastAttacker && player.lastAttacker.length > 0) && (
+            <div>You Lose :(</div>
+          )}
         </>
       )}
-      {player && player.won && (
-          <div>You Won!</div>
-      )}
+      {player && player.won && <div>You Won!</div>}
       <div>
-        {Math.round(player.rightAnswers / (player.deathTime / 1000.0 / 60)) +
-          ' WPM'}
+        {Math.round(player.rightAnswers / (player.deathTime / 1000.0 / 60))} WPM
       </div>
       <div>
-        {'Your accuracy: ' +
-          Math.round(
-            (player.rightAnswers / (player.rightAnswers + player.wrongAnswers)) *
-              100
-          ) +
-          '%'}
+        Your accuracy:{' '}
+        {Math.round(
+          (player.rightAnswers / (player.rightAnswers + player.wrongAnswers)) *
+            100
+        )}
+        %
       </div>
-      <div>
-        {"You KO'd " + player.kills + ' players'}
-      </div>
-      <div>
-        {'Next Game Starts In ' + Math.floor(gameState.loadTime / 1000)}
-      </div>
+      <div>You KO'd {player.kills} players</div>
+      <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>
     </div>
   );
 }
