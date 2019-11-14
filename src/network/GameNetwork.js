@@ -43,8 +43,8 @@ class GameNetwork {
     nullthrows(this._socket).emit('name', { word: name });
   }
 
-  sendWord(input: string) {
-    nullthrows(this._socket).emit('input', input);
+  sendWord(word: string) {
+    nullthrows(this._socket).emit('input', {word});
   }
 
   onStateUpdate(onChange: (gameState: GameState) => void) {
