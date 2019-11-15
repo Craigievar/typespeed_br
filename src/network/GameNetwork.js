@@ -1,6 +1,7 @@
 // @flow
 
-import type {GameState, PlayerID} from '../gameTypes';
+import type {PlayerID, GameStateFromNetwork} from '../gameTypes';
+import GameState from './GameState';
 
 import io from 'socket.io-client';
 import uuid from 'tiny-uuid';
@@ -23,8 +24,8 @@ class GameNetwork {
   _socket: ?Socket;
   _listeners: {[string]: Function} = {};
 
-  _onChange = (gameState: GameState) => {
-    Object.values(this._listeners).forEach(listener => listener(gameState));
+  _onChange = (gameState: GameStateFromNetwork) => {
+    Object.values(this._listeners).forEach(listener => listener(new GameState(gameState, this.getSocketID())));
   }
 
   isConnected(): boolean {

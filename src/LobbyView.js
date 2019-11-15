@@ -1,7 +1,7 @@
 // @flow
 
 import type GameNetwork from './network/GameNetwork';
-import type {GameState} from './gameTypes';
+import GameState from './network/GameState';
 
 import React from 'react';
 import AnimatedText from './animations/AnimatedText';
