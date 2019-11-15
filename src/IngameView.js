@@ -64,15 +64,15 @@ function IngameView({ gameServer, gameState }: Props) {
   return (
     <div>
       {gameState.loadTime >= 0 && (
-        <div class="LobbyView-Header">
+        <div className="LobbyView-Header">
           <div>{Math.floor(gameState.loadTime / 1000) + 1}</div>
         </div>
       )}
       {gameState.loadTime < 0 && (
         <>
-          <div class="IngameView-Queue">
-            <span class="IngameView-Letter-Typed">{inputValue}</span>
-            <span class="IngameView-Letter-Untyped">
+          <div className="IngameView-Queue">
+            <span className="IngameView-Letter-Typed">{inputValue}</span>
+            <span className="IngameView-Letter-Untyped">
               {
                 player.nextWords.length > 0
                 && player.nextWords[0].substr(inputValue.length, player.nextWords[0].length).toLowerCase()
@@ -83,8 +83,8 @@ function IngameView({ gameServer, gameState }: Props) {
               }
             </span>
           </div>
-          <div class="IngameView-Queue">
-            <span class="IngameView-Letter-Untyped">
+          <div className="IngameView-Queue">
+            <span className="IngameView-Letter-Untyped">
               {
                 player.nextWords.length > 1
                 && player.nextWords.slice(1, player.nextWords.length).join(' ').toLowerCase()
