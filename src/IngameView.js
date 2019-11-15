@@ -20,7 +20,7 @@ function isLetter(str: string): boolean {
 }
 
 function IngameView({ gameServer, gameState }: Props) {
-  const player = gameState.players[gameServer.getSocketID()];
+  const player = gameState.getPlayer();
   const [inputValue, setInputValue] = useState('');
 
   const onKeyDown = useCallback(function (event: KeyboardEvent) {

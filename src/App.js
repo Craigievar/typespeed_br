@@ -34,12 +34,14 @@ const GameViewRenderers: { [GameView]: Function } = {
       : IngameView,
 };
 
+let firstPass = true;
+
 function App() {
   const gameServer = useGameServer('localhost:5000');
   const [storedGameState, setStoredGameState] = useLocalStorage('state', UNCONNECTED_GAME_STATE);
   const [playerID, setPlayerID] = useLocalStorage('playerid');
+  const [isReceivingGameState, setIsReceivingGameState] = useLocalStorage('isplaying', true);
   const [gameState, setGameState] = useState(new GameState(storedGameState, playerID));
-  const [isReceivingGameState, setIsReceivingGameState] = useState(storedGameState === UNCONNECTED_GAME_STATE);
 
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
@@ -52,22 +54,16 @@ function App() {
   }, [isReceivingGameState, gameServer]);
 
   useEffect(() => {
-    if (isReceivingGameState) {
-      setStoredGameState(UNCONNECTED_GAME_STATE);
-    } else {
+    if (!isReceivingGameState && !firstPass) {
+      console.log('setting');
       setStoredGameState(gameState);
-    }
-  }, [isReceivingGameState, gameState]);
-
-  useEffect(() => {
-    if (gameServer.isConnected()) {
       setPlayerID(gameServer.getSocketID());
     }
-  }, [gameServer, gameServer.isConnected() && gameServer.getSocketID()]);
 
-  const player = gameServer.isConnected()
-    ? gameState.players[gameServer.getSocketID()]
-    : null;
+    firstPass = false;
+  }, [isReceivingGameState, gameState]);
+
+  const player = gameState.getPlayer();
   const View = GameViewRenderers[gameState.state](player);
 
   return (
@@ -81,7 +77,7 @@ function App() {
       <canvas id="canvas" />
       <button
         className="App-FreezeStateBtn"
-        onClick={() => setIsReceivingGameState(!isReceivingGameState)}
+        onClick={() => setIsReceivingGameState(!isReceivingGameState) && console.log('toggled')}
       >
         [Debug] {isReceivingGameState ? 'FREEZE' : 'UNFREEZE'}
       </button>

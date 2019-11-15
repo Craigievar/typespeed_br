@@ -11,7 +11,7 @@ type Props = {
 };
 
 function PostGameView({ gameServer, gameState }: Props) {
-  const player = gameState.players[gameServer.getSocketID()];
+  const player = gameState.getPlayer();
 
   return (
     <div>
