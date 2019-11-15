@@ -3,12 +3,10 @@
 import type GameNetwork from './network/GameNetwork';
 import type { GameState } from './gameTypes';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import './LobbyView.css';
 import './IngameView.css';
-
-const { useState } = React;
 
 type Props = {
   gameServer: GameNetwork,
@@ -25,11 +23,18 @@ function IngameView({ gameServer, gameState }: Props) {
   const player = gameState.players[gameServer.getSocketID()];
   const [inputValue, setInputValue] = useState('');
 
+  useEffect(() => {
+    window.addEventListener('keypress', onKeyDown);
+  }, [inputValue]);
+
   function onKeyDown(event: KeyboardEvent) {
     let word = inputValue;
+    console.log(word);
     switch (true) {
       case isLetter(String.fromCharCode(event.keyCode)):
+        console.log('Pressed ' + String.fromCharCode(event.keyCode));
         word += String.fromCharCode(event.keyCode).toLowerCase();
+        console.log('Word is ' + word);
         break;
 
       // backspace
@@ -40,6 +45,7 @@ function IngameView({ gameServer, gameState }: Props) {
       // space or enter -- submit!
       case event.keyCode === 32:
       case event.keyCode === 13:
+      console.log('Sending ' + word);
         gameServer.sendWord(word);
         word = '';
         break;
@@ -49,6 +55,7 @@ function IngameView({ gameServer, gameState }: Props) {
     }
 
     setInputValue(word);
+    window.removeEventListener('keypress', onKeyDown);
   }
 
   return (
@@ -60,13 +67,6 @@ function IngameView({ gameServer, gameState }: Props) {
       )}
       {gameState.loadTime < 0 && (
         <>
-          <div>
-           <input
-             class="LobbyView-Input"
-             value={inputValue}
-             onKeyDown={onKeyDown}
-           />
-          </div>
           <div class="IngameView-Queue">
             <span class="IngameView-Letter-Typed">{inputValue}</span>
             <span class="IngameView-Letter-Untyped">
