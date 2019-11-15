@@ -3,7 +3,7 @@
 import type GameNetwork from './network/GameNetwork';
 import GameState from './network/GameState';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import './LobbyView.css';
 import './IngameView.css';
@@ -23,11 +23,7 @@ function IngameView({ gameServer, gameState }: Props) {
   const player = gameState.players[gameServer.getSocketID()];
   const [inputValue, setInputValue] = useState('');
 
-  useEffect(() => {
-    window.addEventListener('keypress', onKeyDown);
-  }, [inputValue]);
-
-  function onKeyDown(event: KeyboardEvent) {
+  const onKeyDown = useCallback(function (event: KeyboardEvent) {
     let word = inputValue;
     console.log(word);
     switch (true) {
@@ -55,8 +51,15 @@ function IngameView({ gameServer, gameState }: Props) {
     }
 
     setInputValue(word);
-    window.removeEventListener('keypress', onKeyDown);
-  }
+  }, [inputValue, setInputValue]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [onKeyDown]);
 
   return (
     <div>
