@@ -142,6 +142,7 @@ function checkForWinner(game) {
     for (const player of Object.values(game.players)) {
       if (player && !player.lost) {
         player.won = true;
+        player.deathTime = game.time;
         game.winner = player.id;
       }
     }
@@ -152,7 +153,7 @@ function checkInput(word, player, id) {
   if (!word) {
     return;
   }
-
+  console.log(word);
   if (word.toLowerCase() === player.nextWords[0].toLowerCase()) {
     player.rightAnswers++;
     player.nextWords.shift();

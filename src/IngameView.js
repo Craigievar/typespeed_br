@@ -5,6 +5,9 @@ import type { GameState } from './gameTypes';
 
 import React from 'react';
 
+import './LobbyView.css';
+import './IngameView.css';
+
 const { useState } = React;
 
 type Props = {
@@ -58,13 +61,38 @@ function IngameView({ gameServer, gameState }: Props) {
       {gameState.loadTime < 0 && (
         <>
           <div>
-            <input
-              class="LobbyView-Input"
-              value={inputValue}
-              onKeyDown={onKeyDown}
-            />
+           <input
+             class="LobbyView-Input"
+             value={inputValue}
+             onKeyDown={onKeyDown}
+           />
           </div>
-          <div>{player.nextWords.join(' ')}</div>
+          <div class="IngameView-Queue">
+            <span class="IngameView-Letter-Typed">{inputValue}</span>
+            <span class="IngameView-Letter-Untyped">
+              {
+                player.nextWords.length > 0
+                && player.nextWords[0].substr(inputValue.length, player.nextWords[0].length).toLowerCase()
+              }
+              {
+                player.nextWords.length === 0
+                && <br></br>
+              }
+            </span>
+          </div>
+          <div class="IngameView-Queue">
+            <span class="IngameView-Letter-Untyped">
+              {
+                player.nextWords.length > 1
+                && player.nextWords.slice(1, player.nextWords.length).join(' ').toLowerCase()
+              }
+              {
+                player.nextWords.length <= 1
+                && <br></br>
+              }
+            </span>
+          </div>
+          <br/>
           <div>
             Words in Queue: {player.nextWords.length}/{WORDS_TO_LOSE}
           </div>

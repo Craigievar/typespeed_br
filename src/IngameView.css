@@ -1,0 +1,17 @@
+.IngameView-Queue {
+  width: inherit;
+  padding-right: 20px;
+  padding-left: 20px;
+  width: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.IngameView-Letter-Untyped {
+  color: white;
+}
+
+.IngameView-Letter-Typed {
+  color: cyan;
+}
