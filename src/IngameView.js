@@ -70,7 +70,7 @@ function IngameView({ gameServer, gameState }: Props) {
 
   return (
     <div>
-      {gameState.loadTime >= 1 && (
+      {gameState.loadTime >= 0 && (
         <div className="LobbyView-Header">
           <div>{Math.floor(gameState.loadTime / 1000) + 1}</div>
         </div>
