@@ -1,0 +1,11 @@
+.PostGameView-Stats-Container {
+  width: inherit;
+  padding: 4px;
+  white-space: nowrap;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: -20px;
+}

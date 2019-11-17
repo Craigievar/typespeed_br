@@ -2,9 +2,9 @@
 
 import type GameNetwork from './network/GameNetwork';
 import GameState from './network/GameState';
+import AnimatedText from './animations/AnimatedText';
 
 import React, { useState, useEffect, useCallback } from 'react';
-
 import './LobbyView.css';
 import './IngameView.css';
 
@@ -13,7 +13,7 @@ type Props = {
   gameState: GameState,
 };
 
-const WORDS_TO_LOSE = 10;
+const WORDS_TO_LOSE = 20;
 const WORDS_TO_SHOW = 13;
 
 function isLetter(str: string): boolean {
@@ -71,8 +71,8 @@ function IngameView({ gameServer, gameState }: Props) {
   return (
     <div>
       {gameState.loadTime >= 0 && (
-        <div className="LobbyView-Header">
-          <div>{Math.floor(gameState.loadTime / 1000) + 1}</div>
+        <div className="IngameView-Countdown">
+          <div><AnimatedText animation="pulse">{Math.floor(gameState.loadTime / 1000) + 1}</AnimatedText></div>
         </div>
       )}
       {gameState.loadTime < 0 && (
