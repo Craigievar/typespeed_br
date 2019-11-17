@@ -14,9 +14,20 @@ type Props = {
 };
 
 const WORDS_TO_LOSE = 10;
+const WORDS_TO_SHOW = 13;
 
 function isLetter(str: string): boolean {
   return str.length === 1 && str.match(/[a-z]/i) !== null;
+}
+
+function getNumMatchedLetters(s1: string, s2: string): int {
+  let matchedLetters = 0;
+  while (matchedLetters < s1.length &&
+    matchedLetters < s2.length &&
+    s1.toLowerCase().charAt(matchedLetters) === s2.toLowerCase().charAt(matchedLetters)){
+    matchedLetters++;
+  }
+  return matchedLetters;
 }
 
 function IngameView({ gameServer, gameState }: Props) {
@@ -25,12 +36,9 @@ function IngameView({ gameServer, gameState }: Props) {
 
   const onKeyDown = useCallback(function (event: KeyboardEvent) {
     let word = inputValue;
-    console.log(word);
     switch (true) {
       case isLetter(String.fromCharCode(event.keyCode)):
-        console.log('Pressed ' + String.fromCharCode(event.keyCode));
         word += String.fromCharCode(event.keyCode).toLowerCase();
-        console.log('Word is ' + word);
         break;
 
       // backspace
@@ -41,7 +49,6 @@ function IngameView({ gameServer, gameState }: Props) {
       // space or enter -- submit!
       case event.keyCode === 32:
       case event.keyCode === 13:
-      console.log('Sending ' + word);
         gameServer.sendWord(word);
         word = '';
         break;
@@ -63,15 +70,29 @@ function IngameView({ gameServer, gameState }: Props) {
 
   return (
     <div>
-      {gameState.loadTime >= 0 && (
+      {gameState.loadTime >= 1 && (
         <div className="LobbyView-Header">
           <div>{Math.floor(gameState.loadTime / 1000) + 1}</div>
         </div>
       )}
       {gameState.loadTime < 0 && (
         <>
+          <div className="IngameView-Stat">
+            Words in Queue: {player.nextWords.length}/{WORDS_TO_LOSE}
+          </div>
+          <div className="IngameView-Stat">Players Left: {gameState.playersLeft}</div>
+          <div className="IngameView-Stat">KOs: {player.kills}</div>
+          <div className="IngameView-Stat">Words: {player.rightAnswers}</div>
+          <div className="IngameView-Stat">Mistakes: {player.wrongAnswers}</div>
+          <br></br>
+          <br></br>
           <div className="IngameView-Queue">
-            <span className="IngameView-Letter-Typed">{inputValue}</span>
+            <span className="IngameView-Letter-Typed-Correct">
+              {inputValue.substr(0, getNumMatchedLetters(inputValue, player.nextWords[0]))}
+            </span>
+            <span className="IngameView-Letter-Typed-Incorrect">
+              {inputValue.substr(getNumMatchedLetters(inputValue, player.nextWords[0]), inputValue.length)}
+            </span>
             <span className="IngameView-Letter-Untyped">
               {
                 player.nextWords.length > 0
@@ -84,10 +105,11 @@ function IngameView({ gameServer, gameState }: Props) {
             </span>
           </div>
           <div className="IngameView-Queue">
-            <span className="IngameView-Letter-Untyped">
+            <span className="IngameView-Letter-Queue">
               {
                 player.nextWords.length > 1
-                && player.nextWords.slice(1, player.nextWords.length).join(' ').toLowerCase()
+                && player.nextWords.slice(1, Math.min(player.nextWords.length, WORDS_TO_SHOW)).
+                  map((d) => <p className="IngameView-Queue-Border">{d.toLowerCase()}</p>)
               }
               {
                 player.nextWords.length <= 1
@@ -96,13 +118,6 @@ function IngameView({ gameServer, gameState }: Props) {
             </span>
           </div>
           <br/>
-          <div>
-            Words in Queue: {player.nextWords.length}/{WORDS_TO_LOSE}
-          </div>
-          <div>Players Left: {gameState.playersLeft}</div>
-          <div>KOs: {player.kills}</div>
-          <div>Words: {player.rightAnswers}</div>
-          <div>Mistakes: {player.wrongAnswers}</div>
         </>
       )}
     </div>

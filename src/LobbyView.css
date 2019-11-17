@@ -1,9 +1,14 @@
 .LobbyView-Container {
   padding: 24px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .LobbyView-Header {
   font-size: 36px;
+  width: 320px;
 }
 
 .LobbyView-Waiting {

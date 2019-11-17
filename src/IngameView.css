@@ -1,3 +1,13 @@
+.IngameView-Stat {
+  width: inherit;
+  padding: 4px;
+  width: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
+}
+
 .IngameView-Queue {
   width: inherit;
   padding-right: 20px;
@@ -6,12 +16,29 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 20px;
 }
 
 .IngameView-Letter-Untyped {
   color: white;
+  font-size: 40px;
 }
 
-.IngameView-Letter-Typed {
+.IngameView-Letter-Typed-Correct {
   color: cyan;
+  font-size: 40px;
+}
+
+.IngameView-Letter-Typed-Incorrect {
+  color: red;
+  font-size: 40px;
+}
+
+.IngameView-Letter-Queue {
+  color: white;
+}
+
+.IngameView-Queue-Border {
+  border-top: 1px solid grey;
+  margin: 4px;
 }
