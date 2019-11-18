@@ -7,23 +7,23 @@ import React from 'react';
 import AnimatedText from './animations/AnimatedText';
 import './LobbyView.css';
 
-const {useState} = React;
+const { useState } = React;
 
 type Props = {
   gameServer: GameNetwork,
   gameState: GameState,
 };
 
-function LobbyView({gameServer, gameState}: Props) {
+function LobbyView({ gameServer, gameState }: Props) {
   const [playerName, setPlayerName] = useState('');
 
   const [isWaiting, setIsWaiting] = useState(false);
 
   function handleSubmit(e) {
     gameServer.joinGame(playerName);
-     e.preventDefault();
+    e.preventDefault();
 
-     setIsWaiting(true);
+    setIsWaiting(true);
   }
 
   return (
@@ -32,12 +32,20 @@ function LobbyView({gameServer, gameState}: Props) {
         <>
           <div class="LobbyView-Header">Enter Your Nickname</div>
           <form onSubmit={handleSubmit}>
-            <input class="LobbyView-Input" value={playerName} onChange={e => setPlayerName(e.target.value)} />
+            <input
+              class="LobbyView-Input"
+              value={playerName}
+              onChange={e => setPlayerName(e.target.value)}
+            />
           </form>
         </>
       )}
       {isWaiting && (
-        <div class="LobbyView-Waiting"><AnimatedText animation="pulse">Waiting for {gameState.playersNeeded} more players</AnimatedText></div>
+        <div class="LobbyView-Waiting">
+          <AnimatedText animation="pulse">
+            Waiting for {gameState.playersNeeded} more players
+          </AnimatedText>
+        </div>
       )}
     </div>
   );

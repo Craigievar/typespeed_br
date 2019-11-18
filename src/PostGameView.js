@@ -34,23 +34,24 @@ function PostGameView({ gameServer, gameState }: Props) {
       )}
       {player && player.won && <div>You Won!</div>}
       <br></br>
+      <div>Your Stats:</div>
       <div>
-        Your Stats:
-      </div>
-      <div>
-        {player && Math.round(player.rightAnswers / (player.deathTime / 1000.0 / 60))} WPM
+        {player &&
+          Math.round(
+            player.rightAnswers / (player.deathTime / 1000.0 / 60)
+          )}{' '}
+        WPM
       </div>
       <div>
         Accuracy:{' '}
-        {player && (player.rightAnswers + player.wrongAnswers > 0) &&
+        {player &&
+          player.rightAnswers + player.wrongAnswers > 0 &&
           Math.round(
-          (player.rightAnswers / (player.rightAnswers + player.wrongAnswers)) *
-            100
-        )}
-        {player && (player.rightAnswers + player.wrongAnswers === 0) &&
-          '-'
-        }
-        %
+            (player.rightAnswers /
+              (player.rightAnswers + player.wrongAnswers)) *
+              100
+          )}
+        {player && player.rightAnswers + player.wrongAnswers === 0 && '-'}%
       </div>
       <div>You KO'd {player && player.kills} players</div>
       <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>

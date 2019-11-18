@@ -3,11 +3,7 @@
 import React from 'react';
 
 function UnconnectedView() {
-  return (
-    <div>
-      Connecting...
-    </div>
-  );
+  return <div>Connecting...</div>;
 }
 
 export default UnconnectedView;

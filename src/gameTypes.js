@@ -16,7 +16,7 @@ export type Player = {
 export type GameView = 'INGAME' | 'POSTGAME' | 'LOBBY' | 'UNCONNECTED';
 
 export type GameStateFromNetwork = {
-  players: {[PlayerID]: Player},
+  players: { [PlayerID]: Player },
   playersNeeded: number,
   state: GameView,
   playersLeft: number,

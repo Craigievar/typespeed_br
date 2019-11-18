@@ -15,14 +15,17 @@ import useLocalStorage from './hooks/useLocalStorage';
 
 const { useEffect, useState } = React;
 
-const UNCONNECTED_GAME_STATE: GameState = new GameState({
-  players: {},
-  playersNeeded: 0,
-  state: 'UNCONNECTED',
-  playersLeft: 0,
-  endTime: 0,
-  loadTime: 0,
-}, window.localStorage.getItem('playerid'));
+const UNCONNECTED_GAME_STATE: GameState = new GameState(
+  {
+    players: {},
+    playersNeeded: 0,
+    state: 'UNCONNECTED',
+    playersLeft: 0,
+    endTime: 0,
+    loadTime: 0,
+  },
+  window.localStorage.getItem('playerid')
+);
 
 const GameViewRenderers: { [GameView]: Function } = {
   UNCONNECTED: (player: ?Player) => UnconnectedView,
@@ -38,10 +41,18 @@ let firstPass = true;
 
 function App() {
   const gameServer = useGameServer('localhost:5000');
-  const [storedGameState, setStoredGameState] = useLocalStorage('state', UNCONNECTED_GAME_STATE);
+  const [storedGameState, setStoredGameState] = useLocalStorage(
+    'state',
+    UNCONNECTED_GAME_STATE
+  );
   const [playerID, setPlayerID] = useLocalStorage('playerid');
-  const [isReceivingGameState, setIsReceivingGameState] = useLocalStorage('isplaying', true);
-  const [gameState, setGameState] = useState(new GameState(storedGameState, playerID));
+  const [isReceivingGameState, setIsReceivingGameState] = useLocalStorage(
+    'isplaying',
+    true
+  );
+  const [gameState, setGameState] = useState(
+    new GameState(storedGameState, playerID)
+  );
 
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
@@ -77,7 +88,10 @@ function App() {
       <canvas id="canvas" />
       <button
         className="App-FreezeStateBtn"
-        onClick={() => setIsReceivingGameState(!isReceivingGameState) && console.log('toggled')}
+        onClick={() =>
+          setIsReceivingGameState(!isReceivingGameState) &&
+          console.log('toggled')
+        }
       >
         [Debug] {isReceivingGameState ? 'FREEZE' : 'UNFREEZE'}
       </button>
