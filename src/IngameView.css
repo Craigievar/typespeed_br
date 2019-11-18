@@ -33,6 +33,10 @@
   font-size: 40px;
 }
 
+.IngameView-Letter-Untyped-Cursor {
+  font-size: 48px;
+}
+
 .IngameView-Letter-Typed-Correct {
   color: cyan;
   font-size: 40px;
@@ -45,6 +49,8 @@
 
 .IngameView-Letter-Queue {
   color: white;
+  font-family: 'Roboto Mono', monospace;
+  letter-spacing: 2px;
 }
 
 .IngameView-Queue-Border {
