@@ -100,7 +100,8 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     300,
     [player.wrongAnswers]
   );
-  useEffect(() => setShellClassName(winFlash || incorrectFlash), [
+
+  useEffect(() => setShellClassName(winFlash || incorrectFlash ), [
     winFlash,
     incorrectFlash,
   ]);
@@ -130,8 +131,18 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
             Players Left: {gameState.playersLeft}
           </div>
           <div className="IngameView-Stat">KOs: {player.kills}</div>
-          <div className="IngameView-Stat">Words: {player.rightAnswers}</div>
-          <div className="IngameView-Stat">Mistakes: {player.wrongAnswers}</div>
+          <div className="IngameView-Stat">
+            <span>Words: </span>
+            <span className="IngameView-WordCount">
+              {player.rightAnswers}
+            </span>
+          </div>
+          <div className="IngameView-Stat">
+            <span>Errors: </span>
+            <span className="IngameView-ErrorCount">
+              {player.wrongAnswers}
+            </span>
+          </div>
           <br></br>
           <br></br>
           {!isMobile() && (

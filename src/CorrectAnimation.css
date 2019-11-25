@@ -18,3 +18,12 @@
 .IngameView-Queue-Border {
   transition: border .3s linear;
 }
+
+.App-Correct .IngameView-WordCount {
+  color: green;
+  transform: scale(1.5)
+}
+.IngameView-WordCount {
+  transition: color .3s linear, transform .3s linear;
+  display: inline-block;
+}

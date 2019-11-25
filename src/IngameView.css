@@ -26,6 +26,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 20px;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .IngameView-Countdown {
@@ -58,7 +59,6 @@
 
 .IngameView-Letter-Queue {
   color: white;
-  font-family: 'Roboto Mono', monospace;
   letter-spacing: 2px;
 }
 
