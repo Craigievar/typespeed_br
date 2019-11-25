@@ -83,7 +83,6 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     300,
     [player.rightAnswers]
   );
-  console.log(winFlash);
   useEffect(() => setShellClassName(winFlash), [winFlash]);
   useEffect(() => {
     return () => {

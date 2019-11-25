@@ -12,7 +12,7 @@ type Props = {
 
 function AnimatedText({children, animation}: Props) {
   return (
-    <div class={`text animated ${animation}`}>
+    <div className={`text animated ${animation}`}>
       {children}
     </div>
   );

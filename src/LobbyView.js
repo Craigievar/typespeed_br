@@ -27,13 +27,13 @@ function LobbyView({ gameServer, gameState }: Props) {
   }
 
   return (
-    <div class="LobbyView-Container">
+    <div className="LobbyView-Container">
       {!isWaiting && (
         <>
-          <div class="LobbyView-Header">Enter Your Nickname</div>
+          <div className="LobbyView-Header">Enter Your Nickname</div>
           <form onSubmit={handleSubmit}>
             <input
-              class="LobbyView-Input"
+              className="LobbyView-Input"
               value={playerName}
               onChange={e => setPlayerName(e.target.value)}
             />
@@ -41,7 +41,7 @@ function LobbyView({ gameServer, gameState }: Props) {
         </>
       )}
       {isWaiting && (
-        <div class="LobbyView-Waiting">
+        <div className="LobbyView-Waiting">
           <AnimatedText animation="pulse">
             Waiting for {gameState.playersNeeded} more players
           </AnimatedText>
