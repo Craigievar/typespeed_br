@@ -80,11 +80,11 @@ function App() {
   const [shellClassName, setShellClassName] = useState(null);
 
   return (
-    <div className="App">
+    <div className={classnames('App', shellClassName)}>
       <header className="App-header">
-        <h1 className="">Typespeed BR</h1>
+        <h1>Typespeed BR</h1>
       </header>
-      <div className={classnames('App-GameShell', shellClassName)}>
+      <div className="App-GameShell">
         <View
           gameServer={gameServer}
           gameState={gameState}

@@ -7,12 +7,14 @@ import AnimatedText from './animations/AnimatedText';
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyView.css';
 import './IngameView.css';
+import './CorrectAnimation.css';
+import './IncorrectAnimation.css';
 import useAnimation from './hooks/useAnimation';
 
 type Props = {
   gameServer: GameNetwork,
   gameState: GameState,
-  setShellClassName: (?string) => void
+  setShellClassName: (?string) => void,
 };
 
 const WORDS_TO_LOSE = 20;
@@ -78,12 +80,22 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
 
   const winFlash = useAnimation(
     () => {
-      return player.rightAnswers > 0 ? 'App-GameShell-Correct' : null;
+      return player.rightAnswers > 0 ? 'App-Correct' : null;
     },
     300,
     [player.rightAnswers]
   );
-  useEffect(() => setShellClassName(winFlash), [winFlash]);
+  const incorrectFlash = useAnimation(
+    () => {
+      return player.wrongAnswers > 0 ? 'App-Incorrect' : null;
+    },
+    300,
+    [player.wrongAnswers]
+  );
+  useEffect(() => setShellClassName(winFlash || incorrectFlash), [
+    winFlash,
+    incorrectFlash,
+  ]);
   useEffect(() => {
     return () => {
       setShellClassName(null);

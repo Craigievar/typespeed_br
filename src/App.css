@@ -31,12 +31,6 @@
   min-width: 350px;
   position: relative;
   overflow: hidden;
-
-  transition: border .3s linear;
-}
-
-.App-GameShell-Correct {
-  border: 2px solid green;
 }
 
 .App-FreezeStateBtn {

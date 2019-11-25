@@ -1,0 +1,13 @@
+.App-Correct .App-GameShell {
+  border: 2px solid green;
+}
+.App-GameShell {
+  transition: border .3s linear;
+}
+
+.App-Correct .App-header {
+  color: green;
+}
+.App-header {
+  transition: color .3s linear;
+}
