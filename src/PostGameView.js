@@ -13,6 +13,8 @@ type Props = {
 function PostGameView({ gameServer, gameState }: Props) {
   const player = gameState.getPlayer();
 
+  console.log(player.rightAnswers, player.deathTime);
+
   return (
     <div className="PostGameView-Stats-Container">
       {player && player.lost && (
@@ -32,9 +34,8 @@ function PostGameView({ gameServer, gameState }: Props) {
           <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>
         </>
       )}
-      {player && player.won && <div>You Won!</div>}
+      {player && player.won && <h2>You Won!</h2>}
       <br></br>
-      <div>Your Stats:</div>
       <div>
         {player &&
           Math.round(

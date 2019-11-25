@@ -12,7 +12,7 @@
   transition: color .3s linear;
 }
 
-.App-Correct .IngameView-Queue-Border {
+.App-Incorrect .IngameView-Queue-Border {
   border-top: 1px solid red;
 }
 .IngameView-Queue-Border {
