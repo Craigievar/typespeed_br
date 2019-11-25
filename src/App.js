@@ -41,7 +41,7 @@ const GameViewRenderers: { [GameView]: Function } = {
 let firstPass = true;
 
 function App() {
-  const gameServer = useGameServer('192.168.1.9:5000');
+  const gameServer = useGameServer('192.168.1.5:5000');
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
     UNCONNECTED_GAME_STATE

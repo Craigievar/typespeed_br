@@ -21,7 +21,7 @@
 
 .App-Correct .IngameView-WordCount {
   color: green;
-  transform: scale(1.5)
+  transform: scale(1.5);
 }
 .IngameView-WordCount {
   transition: color .3s linear, transform .3s linear;
