@@ -194,6 +194,7 @@ function resetGame(game) {
   game.state = 'LOBBY';
   game.playersLeft = 0;
   game.loadTime = COUNTDOWN_LENGTH;
+  game.time = 0;
   game.inCountdown = false;
   game.delay = MS_PER_WORD_BASE;
   game.playersNeeded = MIN_PLAYERS_TO_START;
