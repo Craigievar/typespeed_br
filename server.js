@@ -45,6 +45,7 @@ const gameState = {
   playersNeeded: MIN_PLAYERS_TO_START,
   time: 0,
   endTime: 0,
+  lastTickTimeMs: 0,
   winner: '',
 };
 
@@ -208,6 +209,10 @@ function resetGame(game) {
 }
 
 function updateGameState(game) {
+  const time = Date.now();
+  const deltaTime = time - game.lastTickTimeMs;
+  game.lastTickTimeMs = time;
+
   if (game.state === 'LOBBY') {
     const playersReady = numReadyPlayers(game);
     game.playersNeeded = MIN_PLAYERS_TO_START - playersReady;
@@ -223,9 +228,9 @@ function updateGameState(game) {
     }
   } else if (game.state === 'INGAME') {
     if (game.loadTime >= 0) {
-      game.loadTime -= 1000 / 60;
+      game.loadTime -= deltaTime;
     } else {
-      game.time += 1000 / 60;
+      game.time += deltaTime;
       if (game.inCountdown) {
         game.inCountdown = false;
         // kick off word generation
@@ -249,7 +254,7 @@ function updateGameState(game) {
     }
   } else if (game.state === 'POSTGAME') {
     if (game.loadTime >= 0) {
-      game.loadTime -= 1000 / 60;
+      game.loadTime -= deltaTime;
     } else {
       console.log(game.state);
       console.log(game.loadTime);
