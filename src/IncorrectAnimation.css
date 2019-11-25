@@ -12,9 +12,18 @@
   transition: color .3s linear;
 }
 
-.App-Correct .IngameView-Queue-Border {
+.App-Incorrect .IngameView-Queue-Border {
   border-top: 1px solid red;
 }
 .IngameView-Queue-Border {
   transition: border .3s linear;
+}
+
+.App-Incorrect .IngameView-ErrorCount {
+  color: red;
+  transform: scale(1.5);
+}
+.IngameView-ErrorCount {
+  transition: color .3s linear;
+  display: inline-block;
 }
