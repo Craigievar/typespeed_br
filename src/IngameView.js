@@ -110,19 +110,6 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     };
   }, []);
 
-  const hiddenInputRef = useRef();
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (hiddenInputRef.current) {
-        hiddenInputRef.current.focus();
-      }
-    }, 100);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [hiddenInputRef]);
-
   return (
     <div>
       {gameState.loadTime >= 0 && (
@@ -176,9 +163,8 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
             >
               <input
                 type="text"
-                autofocus="true"
+                autoFocus="true"
                 className="App-Input"
-                ref={hiddenInputRef}
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
               />

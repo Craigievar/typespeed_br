@@ -4,9 +4,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-}
-
-.IngameView-HiddenInput {
+  padding: 10%;
 }
 
 .IngameView-Stat {
