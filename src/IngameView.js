@@ -7,10 +7,12 @@ import AnimatedText from './animations/AnimatedText';
 import React, { useState, useEffect, useCallback } from 'react';
 import './LobbyView.css';
 import './IngameView.css';
+import useAnimation from './hooks/useAnimation';
 
 type Props = {
   gameServer: GameNetwork,
   gameState: GameState,
+  setShellClassName: (?string) => void
 };
 
 const WORDS_TO_LOSE = 20;
@@ -33,7 +35,7 @@ function getNumMatchedLetters(s1: string, s2: string): number {
   return matchedLetters;
 }
 
-function IngameView({ gameServer, gameState }: Props) {
+function IngameView({ gameServer, gameState, setShellClassName }: Props) {
   const player = gameState.getPlayer();
   const [inputValue, setInputValue] = useState('');
 
@@ -74,6 +76,21 @@ function IngameView({ gameServer, gameState }: Props) {
     };
   }, [onKeyDown]);
 
+  const winFlash = useAnimation(
+    () => {
+      return player.rightAnswers > 0 ? 'App-GameShell-Correct' : null;
+    },
+    300,
+    [player.rightAnswers]
+  );
+  console.log(winFlash);
+  useEffect(() => setShellClassName(winFlash), [winFlash]);
+  useEffect(() => {
+    return () => {
+      setShellClassName(null);
+    };
+  }, []);
+
   return (
     <div>
       {gameState.loadTime >= 0 && (
@@ -86,7 +103,7 @@ function IngameView({ gameServer, gameState }: Props) {
         </div>
       )}
       {gameState.loadTime < 0 && (
-        <>
+        <div className="IngameView-Container">
           <div className="IngameView-Stat">
             Words in Queue: {player.nextWords.length}/{WORDS_TO_LOSE}
           </div>
@@ -131,7 +148,7 @@ function IngameView({ gameServer, gameState }: Props) {
             </span>
           </div>
           <br />
-        </>
+        </div>
       )}
     </div>
   );

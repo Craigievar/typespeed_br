@@ -12,6 +12,7 @@ import React from 'react';
 import UnconnectedView from './UnconnectedView';
 import useGameServer from './network/useGameServer';
 import useLocalStorage from './hooks/useLocalStorage';
+import classnames from 'classnames';
 
 const { useEffect, useState } = React;
 
@@ -76,14 +77,19 @@ function App() {
 
   const player = gameState.getPlayer();
   const View = GameViewRenderers[gameState.state](player);
+  const [shellClassName, setShellClassName] = useState(null);
 
   return (
     <div className="App">
       <header className="App-header">
         <h1 className="">Typespeed BR</h1>
       </header>
-      <div className="App-GameShell">
-        <View gameServer={gameServer} gameState={gameState} />
+      <div className={classnames('App-GameShell', shellClassName)}>
+        <View
+          gameServer={gameServer}
+          gameState={gameState}
+          setShellClassName={className => setShellClassName(className)}
+        />
       </div>
       <canvas id="canvas" />
       <button
