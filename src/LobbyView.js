@@ -33,7 +33,7 @@ function LobbyView({ gameServer, gameState }: Props) {
           <div className="LobbyView-Header">Enter Your Nickname</div>
           <form onSubmit={handleSubmit}>
             <input
-              className="LobbyView-Input"
+              className="App-Input"
               value={playerName}
               onChange={e => setPlayerName(e.target.value)}
             />

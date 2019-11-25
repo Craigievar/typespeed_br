@@ -177,7 +177,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
               <input
                 type="text"
                 autofocus="true"
-                className="LobbyView-Input"
+                className="App-Input"
                 ref={hiddenInputRef}
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}

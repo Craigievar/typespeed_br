@@ -22,17 +22,3 @@
 .LobbyView-InputTray {
   display: flex;
 }
-
-.LobbyView-Input {
-  flex: 1;
-  margin-top: 24px;
-  color: white;
-  display: inline-block;
-  font-size: 36px;
-  width: 100%;
-  border: 1px solid #008080;
-  border-radius: 4px;
-  background-color: transparent;
-  text-align: center;
-  outline: none;
-}
