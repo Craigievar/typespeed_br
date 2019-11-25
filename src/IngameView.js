@@ -4,12 +4,13 @@ import type GameNetwork from './network/GameNetwork';
 import GameState from './network/GameState';
 import AnimatedText from './animations/AnimatedText';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './LobbyView.css';
 import './IngameView.css';
 import './CorrectAnimation.css';
 import './IncorrectAnimation.css';
 import useAnimation from './hooks/useAnimation';
+import isMobile from './isMobile';
 
 type Props = {
   gameServer: GameNetwork,
@@ -69,9 +70,16 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     },
     [inputValue, setInputValue]
   );
+  const onMobileSubmit = (e) => {
+    gameServer.sendWord(inputValue);
+    setInputValue('');
+    e.preventDefault();
+  };
 
   useEffect(() => {
-    window.addEventListener('keydown', onKeyDown);
+    if (!isMobile()) {
+      window.addEventListener('keydown', onKeyDown);
+    }
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
@@ -102,6 +110,19 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     };
   }, []);
 
+  const hiddenInputRef = useRef();
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.focus();
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [hiddenInputRef]);
+
   return (
     <div>
       {gameState.loadTime >= 0 && (
@@ -126,32 +147,48 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
           <div className="IngameView-Stat">Mistakes: {player.wrongAnswers}</div>
           <br></br>
           <br></br>
-          <div className="IngameView-Queue">
-            <span className="IngameView-Letter-Typed-Correct">
-              {inputValue.substr(
-                0,
-                getNumMatchedLetters(inputValue, player.nextWords[0])
-              )}
-            </span>
-            <span className="IngameView-Letter-Typed-Incorrect">
-              {inputValue.substr(
-                getNumMatchedLetters(inputValue, player.nextWords[0]),
-                inputValue.length
-              )}
-            </span>
-            <span className="IngameView-Letter-Untyped">
-              {player.nextWords.length > 0 &&
-                player.nextWords[0]
-                  .substr(inputValue.length, player.nextWords[0].length)
-                  .toLowerCase()}
-              {player.nextWords.length === 0 && <br></br>}
-            </span>
-          </div>
+          {!isMobile() && (
+            <div className="IngameView-Queue">
+              <span className="IngameView-Letter-Typed-Correct">
+                {inputValue.substr(
+                  0,
+                  getNumMatchedLetters(inputValue, player.nextWords[0])
+                )}
+              </span>
+              <span className="IngameView-Letter-Typed-Incorrect">
+                {inputValue.substr(
+                  getNumMatchedLetters(inputValue, player.nextWords[0]),
+                  inputValue.length
+                )}
+              </span>
+              <span className="IngameView-Letter-Untyped">
+                {player.nextWords.length > 0 &&
+                  player.nextWords[0]
+                    .substr(inputValue.length, player.nextWords[0].length)
+                    .toLowerCase()}
+                {player.nextWords.length === 0 && <br></br>}
+              </span>
+            </div>
+          )}
+          {isMobile() && (
+            <form
+              onSubmit={onMobileSubmit}
+            >
+              <input
+                type="text"
+                autofocus="true"
+                className="LobbyView-Input"
+                ref={hiddenInputRef}
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+              />
+            </form>
+          )}
           <div className="IngameView-Queue">
             <span className="IngameView-Letter-Queue">
               {player.nextWords.length > 1 &&
                 player.nextWords
-                  .slice(1, Math.min(player.nextWords.length, WORDS_TO_SHOW))
+                  .slice(isMobile() ? 0 : 1, Math.min(player.nextWords.length, WORDS_TO_SHOW))
                   .map(d => (
                     <p className="IngameView-Queue-Border">{d.toLowerCase()}</p>
                   ))}

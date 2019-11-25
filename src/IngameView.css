@@ -6,6 +6,9 @@
   right: 0;
 }
 
+.IngameView-HiddenInput {
+}
+
 .IngameView-Stat {
   width: inherit;
   padding: 4px;
