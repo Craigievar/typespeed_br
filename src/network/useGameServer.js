@@ -8,9 +8,16 @@ const {useEffect, useState} = React;
 
 const gameNetwork = new GameNetwork();
 
-function useGameServer(address: string): GameNetwork {
+function useGameServer(): GameNetwork {
   useEffect(() => {
-    gameNetwork.connectToAddress(address);
+    if (process.env.REACT_APP_GAME_SERVER_PORT !== undefined) {
+      const url = new URL(window.location.origin);
+      url.port = process.env.REACT_APP_GAME_SERVER_PORT;
+      gameNetwork.connectToAddress(url.href);
+    } else {
+      gameNetwork.connectToAddress();
+    }
+
   }, []);
 
   return gameNetwork;
