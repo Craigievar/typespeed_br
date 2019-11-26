@@ -6,6 +6,7 @@ export type Player = {
   inGame: boolean,
   lost: boolean,
   lastAttacker: PlayerID,
+  lastTarget: string,
   deathTime: number,
   won: boolean,
   nextWords: Array<string>,

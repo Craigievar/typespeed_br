@@ -42,6 +42,21 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
   const player = gameState.getPlayer();
   const [inputValue, setInputValue] = useState('');
 
+  function queueClass(length: int): string {
+    console.log(length);
+    console.log(WORDS_TO_LOSE);
+    if(length <= (WORDS_TO_LOSE / 2)){
+      return 'Safe';
+    }
+    if(length <= (WORDS_TO_LOSE * 4.0 / 5.0)){
+      return 'Warning';
+    }
+    if(length > WORDS_TO_LOSE * 4.0 / 5.0){
+      return 'Danger';
+    }
+    return 'Fallthrough';
+  }
+
   const onKeyDown = useCallback(
     function(event: KeyboardEvent) {
       let word = inputValue;
@@ -125,7 +140,10 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
       {gameState.loadTime < 0 && (
         <div className="IngameView-Container">
           <div className="IngameView-Stat">
-            Words in Queue: {player.nextWords.length}/{WORDS_TO_LOSE}
+            <span>Words in Queue: </span>
+            <span className={"IngameView-QueueLengthDisplay-" + queueClass(player.nextWords.length)}>
+              {player.nextWords.length}/{WORDS_TO_LOSE}
+            </span>
           </div>
           <div className="IngameView-Stat">
             Players Left: {gameState.playersLeft}
@@ -142,6 +160,9 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
             <span className="IngameView-ErrorCount">
               {player.wrongAnswers}
             </span>
+          </div>
+          <div className="IngameView-Target">
+            Attacked {player.lastTarget !== null && player.lastTarget}
           </div>
           <br></br>
           <br></br>

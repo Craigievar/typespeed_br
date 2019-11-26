@@ -41,11 +41,12 @@ const GameViewRenderers: { [GameView]: Function } = {
 let firstPass = true;
 
 function App() {
-  const gameServer = useGameServer('192.168.1.5:5000');
+  const gameServer = useGameServer('localhost:5000');
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
     UNCONNECTED_GAME_STATE
   );
+
   const [playerID, setPlayerID] = useLocalStorage('playerid');
   const [isReceivingGameState, setIsReceivingGameState] = useLocalStorage(
     'isplaying',
@@ -54,7 +55,7 @@ function App() {
   const [gameState, setGameState] = useState(
     new GameState(storedGameState, playerID)
   );
-
+  
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
       if (isReceivingGameState) {

@@ -162,6 +162,7 @@ function checkInput(word, player, id) {
     if (gameState.players[target]) {
       gameState.players[target].nextWords.push(word);
       gameState.players[target].lastAttacker = id;
+      player.lastTarget = gameState.players[target].name;
     }
   } else {
     player.wrongAnswers++;

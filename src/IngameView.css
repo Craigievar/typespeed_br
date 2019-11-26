@@ -66,3 +66,19 @@
   border-top: 1px solid grey;
   margin: 4px;
 }
+
+.IngameView-QueueLengthDisplay-Safe {
+  color: green;
+}
+
+.IngameView-QueueLengthDisplay-Warning {
+  color: yellow;
+}
+
+.IngameView-QueueLengthDisplay-Danger {
+  color: red;
+}
+
+.IngameView-Target {
+  opacity: 0;
+}

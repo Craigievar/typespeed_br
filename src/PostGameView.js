@@ -13,7 +13,7 @@ type Props = {
 function PostGameView({ gameServer, gameState }: Props) {
   const player = gameState.getPlayer();
 
-  console.log(player.rightAnswers, player.deathTime);
+  //console.log(player.rightAnswers, player.deathTime);
 
   return (
     <div className="PostGameView-Stats-Container">
