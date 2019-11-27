@@ -24,11 +24,24 @@ const socketIO = require('socket.io');
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
 const io = socketIO(server);
-app.set('port', 5000);
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, 'build')));
+app.get('/ping', function (req, res) {
+ return res.send('pong');
+});
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+const port = process.env.PORT || 8080;
+app.set('port', port);
+// app.listen(port);
 
 // Start the server.
-server.listen(process.env.PORT || 5000, function() {
-  console.log('Starting server on port 5000');
+server.listen(port, function() {
+  console.log('Starting server on port' + (port));
 });
 
 // Add the WebSocket handlers

@@ -36,7 +36,7 @@ class GameNetwork {
     return nullthrows(this._socket).io.engine.id;
   }
 
-  connectToAddress(address: string) {
+  connectToAddress(address: string | void) {
     if (this._socket) {
       return;
     }
