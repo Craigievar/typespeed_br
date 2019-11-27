@@ -82,3 +82,7 @@
 .IngameView-Target {
   opacity: 0;
 }
+
+.IngameView-Targeter {
+  opacity: 0;
+}

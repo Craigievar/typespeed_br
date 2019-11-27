@@ -92,9 +92,11 @@ function newPlayer(id) {
     kills: 0,
     wrongAnswers: 0,
     rightAnswers: 0,
+    lastTarget: '',
     lastAttacker: '',
     winner: '',
     deathTime: 1,
+    timesAttacked: 0,
   };
 }
 
@@ -175,6 +177,7 @@ function checkInput(word, player, id) {
     if (gameState.players[target]) {
       gameState.players[target].nextWords.push(word);
       gameState.players[target].lastAttacker = id;
+      gameState.players[target].timesAttacked += 1;
       player.lastTarget = gameState.players[target].name;
     }
   } else {

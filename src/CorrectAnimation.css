@@ -27,13 +27,13 @@
   transition: color .3s linear, transform .3s linear;
   display: inline-block;
 }
-
+/*
 .App-Correct .IngameView-Target {
   color: green;
   transform: scale(2.0);
   opacity: 100;
 }
 .IngameView-Target {
-  transition: color .3s linear, transform .3s linear;
+  transition: color .5s linear, transform .5s linear;
   display: inline-block;
-}
+} */

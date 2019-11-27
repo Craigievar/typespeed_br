@@ -13,6 +13,7 @@ export type Player = {
   kills: number,
   rightAnswers: number,
   wrongAnswers: number,
+  timesAttacked: number,
 };
 export type GameView = 'INGAME' | 'POSTGAME' | 'LOBBY' | 'UNCONNECTED';
 

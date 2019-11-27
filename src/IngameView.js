@@ -9,6 +9,7 @@ import './LobbyView.css';
 import './IngameView.css';
 import './CorrectAnimation.css';
 import './IncorrectAnimation.css';
+import './AttackedAnimation.css';
 import useAnimation from './hooks/useAnimation';
 import isMobile from './isMobile';
 
@@ -41,6 +42,8 @@ function getNumMatchedLetters(s1: string, s2: string): number {
 function IngameView({ gameServer, gameState, setShellClassName }: Props) {
   const player = gameState.getPlayer();
   const [inputValue, setInputValue] = useState('');
+  const [attackedClassname, setAttackedClassname] = useState('');
+  const [attackingClassname, setAttackingClassname] = useState('');
 
   function queueClass(length: int): string {
     console.log(length);
@@ -101,7 +104,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     };
   }, [onKeyDown]);
 
-  const winFlash = useAnimation(
+  const correctFlash = useAnimation(
     () => {
       return player.rightAnswers > 0 ? 'App-Correct' : null;
     },
@@ -116,13 +119,49 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     [player.wrongAnswers]
   );
 
-  useEffect(() => setShellClassName(winFlash || incorrectFlash ), [
-    winFlash,
+  const attackingFlash = useAnimation(
+    () => {
+      return player.rightAnswers > 0 ? 'IngameView-Attacking' : null;
+    },
+    1000,
+    [player.rightAnswers]
+  );
+
+  const attackedFlash = useAnimation(
+    () => {
+      return gameState.players[player.lastAttacker] &&
+        gameState.players[player.lastAttacker].name !== null ?
+        'IngameView-Attacked' : null;
+    },
+    1000,
+    [player.timesAttacked]
+  );
+
+  useEffect(() => setShellClassName(correctFlash || incorrectFlash ), [
+    correctFlash,
     incorrectFlash,
   ]);
   useEffect(() => {
     return () => {
       setShellClassName(null);
+    };
+  }, []);
+
+  useEffect(() => (setAttackingClassname(attackingFlash)), [
+    attackingFlash,
+  ]);
+  useEffect(() => {
+    return () => {
+      setAttackingClassname(null);
+    };
+  }, []);
+
+  useEffect(() => (setAttackedClassname(attackedFlash)), [
+    attackedFlash,
+  ]);
+  useEffect(() => {
+    return () => {
+      setAttackedClassname(null);
     };
   }, []);
 
@@ -161,8 +200,17 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
               {player.wrongAnswers}
             </span>
           </div>
-          <div className="IngameView-Target">
-            Attacked {player.lastTarget !== null && player.lastTarget}
+          <div className={attackingClassname}>
+            <div className="IngameView-Target">
+              Attacked {player.lastTarget !== null && player.lastTarget}
+            </div>
+          </div>
+          <div className={attackedClassname}>
+            <div className="IngameView-Targeter">
+              Attacked by {gameState.players[player.lastAttacker] &&
+                gameState.players[player.lastAttacker].name !== null
+                && gameState.players[player.lastAttacker].name}
+            </div>
           </div>
           <br></br>
           <br></br>
