@@ -55,7 +55,7 @@ function App() {
   const [gameState, setGameState] = useState(
     new GameState(storedGameState, playerID)
   );
-  
+
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
       if (isReceivingGameState) {

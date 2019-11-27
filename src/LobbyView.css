@@ -1,4 +1,5 @@
 .LobbyView-Container {
+  font-family: 'Roboto Mono', monospace;
   padding: 10%;
   position: absolute;
   top: 50%;
@@ -19,6 +20,33 @@
   transform: translate(-50%, -50%);
 }
 
+.LobbyView-Waiting-Small {
+  font-size: 24px;
+  position: absolute;
+  width: 80%;
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .LobbyView-InputTray {
   display: flex;
+}
+
+.LobbyView-Instructions {
+  margin-top: 24px;
+  padding: 10px;
+  color: white;
+  display: inline-block;
+  font-size: 18px;
+  width: 80%;
+  border: 1px solid #008080;
+  border-radius: 4px;
+  background-color: transparent;
+  text-align: center;
+  outline: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 450%);
 }
