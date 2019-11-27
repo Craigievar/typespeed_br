@@ -2,11 +2,27 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+console.log('public url: ', process.env.PUBLIC_URL);
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+if (process.env.REACT_APP_GAME_SERVER_URI !== undefined) {
+  window.FBInstant.initializeAsync()
+    .then(() => {
+      window.FBInstant.startGameAsync()
+        .then(() => {
+          // const contextId = window.FBInstant.context.getID();
+          // const contextType = window.FBInstant.context.getType();
+          //
+          // const playerName = window.FBInstant.player.getName();
+          // const playerPic = window.FBInstant.player.getPhoto();
+          // const playerId = window.FBInstant.player.getID();
+
+          ReactDOM.render(<App />, document.getElementById('root'));
+      });
+    })
+    .catch(e => {
+      console.error(e);
+    });
+} else {
+  ReactDOM.render(<App />, document.getElementById('root'));
+}
