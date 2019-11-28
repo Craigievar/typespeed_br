@@ -86,3 +86,7 @@
 .IngameView-Targeter {
   opacity: 0;
 }
+
+.IngameView-Kill-Target {
+  opacity: 0;
+}

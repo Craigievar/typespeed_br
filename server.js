@@ -93,6 +93,7 @@ function newPlayer(id) {
     wrongAnswers: 0,
     rightAnswers: 0,
     lastTarget: '',
+    lastKilled: '',
     lastAttacker: '',
     winner: '',
     deathTime: 1,
@@ -259,11 +260,12 @@ function updateGameState(game) {
       for (const player of Object.values(game.players)) {
         const hadLost = player.lost;
         player.lost = checkIfLost(player);
-        if (player.lost) {
+        if (!hadLost && player.lost) {
           player.deathTime = game.time;
           const killer = player.lastAttacker;
-          if (!hadLost && game.players[killer]) {
+          if (game.players[killer]) {
             game.players[killer].kills++;
+            game.players[killer].lastKilled = player.name;
           }
         }
       }

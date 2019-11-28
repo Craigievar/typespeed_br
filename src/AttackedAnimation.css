@@ -19,3 +19,14 @@
   transition: color .5s linear, transform .5s linear, opacity .25s linear;
   display: inline-block;
 }
+
+.IngameView-Killed .IngameView-Kill-Target {
+  color: yellow;
+  transform: scale(1.5);
+  opacity: 100;
+}
+
+.IngameView-Kill-Target {
+  transition: color .75s linear, transform .75s linear, opacity .5s linear;
+  display: inline-block;
+}

@@ -44,10 +44,9 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
   const [inputValue, setInputValue] = useState('');
   const [attackedClassname, setAttackedClassname] = useState('');
   const [attackingClassname, setAttackingClassname] = useState('');
+  const [killedClassname, setKilledClassname] = useState('');
 
   function queueClass(length: int): string {
-    console.log(length);
-    console.log(WORDS_TO_LOSE);
     if(length <= (WORDS_TO_LOSE / 2)){
       return 'Safe';
     }
@@ -137,6 +136,15 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     [player.timesAttacked]
   );
 
+  const killFlash = useAnimation(
+    () => {
+      return player.lastKilled !== null ?
+        'IngameView-Killed' : null;
+    },
+    1500,
+    [player.kills]
+  );
+
   useEffect(() => setShellClassName(correctFlash || incorrectFlash ), [
     correctFlash,
     incorrectFlash,
@@ -164,6 +172,25 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
       setAttackedClassname(null);
     };
   }, []);
+
+  useEffect(() => (setKilledClassname(attackedFlash)), [
+    attackedFlash,
+  ]);
+  useEffect(() => {
+    return () => {
+      setAttackedClassname(null);
+    };
+  }, []);
+
+  useEffect(() => (setKilledClassname(killFlash)), [
+    killFlash,
+  ]);
+  useEffect(() => {
+    return () => {
+      setKilledClassname(null);
+    };
+  }, []);
+
 
   return (
     <div>
@@ -210,6 +237,11 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
               Attacked by {gameState.players[player.lastAttacker] &&
                 gameState.players[player.lastAttacker].name !== null
                 && gameState.players[player.lastAttacker].name}
+            </div>
+          </div>
+          <div className={killedClassname}>
+            <div className="IngameView-Kill-Target">
+              Killed {player.lastKilled} {player.kills}
             </div>
           </div>
           <br></br>
