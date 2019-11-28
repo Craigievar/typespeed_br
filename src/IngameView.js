@@ -105,7 +105,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
 
   const correctFlash = useAnimation(
     () => {
-      return player.rightAnswers > 0 ? 'App-Correct' : null;
+      return (player && player.rightAnswers && (player.rightAnswers > 0)) ? 'App-Correct' : null;
     },
     300,
     [player.rightAnswers]

@@ -14,8 +14,8 @@ const MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START;
 const COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH;
 const RESET_LENGTH = config.RESET_LENGTH;
 const PLAYERS_TO_WIN = config.PLAYERS_TO_WIN;
-console.log(RESET_LENGTH);
-console.log(PLAYERS_TO_WIN);
+// console.log(RESET_LENGTH);
+// console.log(PLAYERS_TO_WIN);
 
 // Dependencies
 const express = require('express');
@@ -157,7 +157,7 @@ function checkForWinner(game) {
       game.endTime = game.time;
     }
     for (const player of Object.values(game.players)) {
-      if (player && !player.lost) {
+      if (player && (!player.lost) && player.inGame) {
         player.won = true;
         player.deathTime = game.time;
         game.winner = player.id;
@@ -170,7 +170,7 @@ function checkInput(word, player, id) {
   if (!word) {
     return;
   }
-  console.log(word);
+  // console.log(word);
   if (word.toLowerCase() === player.nextWords[0].toLowerCase()) {
     player.rightAnswers++;
     player.nextWords.shift();
@@ -262,6 +262,8 @@ function updateGameState(game) {
         player.lost = checkIfLost(player);
         if (!hadLost && player.lost) {
           player.deathTime = game.time;
+          player.inGame = false;
+          player.won = false;
           const killer = player.lastAttacker;
           if (game.players[killer]) {
             game.players[killer].kills++;
@@ -276,8 +278,8 @@ function updateGameState(game) {
     if (game.loadTime >= 0) {
       game.loadTime -= deltaTime;
     } else {
-      console.log(game.state);
-      console.log(game.loadTime);
+      // console.log(game.state);
+      // console.log(game.loadTime);
       resetGame(game);
     }
   }

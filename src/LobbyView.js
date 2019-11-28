@@ -25,7 +25,7 @@ function LobbyView({ gameServer, gameState }: Props) {
 
     setIsWaiting(true);
   }
-
+  
   return (
     <div className="LobbyView-Container">
       {isWaiting && !showInstructions && (

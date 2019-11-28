@@ -12,9 +12,6 @@ type Props = {
 
 function PostGameView({ gameServer, gameState }: Props) {
   const player = gameState.getPlayer();
-
-  //console.log(player.rightAnswers, player.deathTime);
-
   return (
     <div className="PostGameView-Stats-Container">
       {player && player.lost && (
@@ -28,34 +25,39 @@ function PostGameView({ gameServer, gameState }: Props) {
         </>
       )}
       {player && !player.lost && <br></br>}
-      {player && !player.inGame && (
+      {player && !player.inGame && (gameState.playersLeft > 1) && (
         <>
-          <div>In game with {gameState.playersLeft} players left!</div>
-          <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>
+          <div>In game, {gameState.playersLeft} players left!</div>
         </>
       )}
       {player && player.won && <h2>You Won!</h2>}
       <br></br>
-      <div>
-        {player &&
-          Math.round(
-            player.rightAnswers / (player.deathTime / 1000.0 / 60)
-          )}{' '}
-        WPM
-      </div>
-      <div>
-        Accuracy:{' '}
-        {player &&
-          player.rightAnswers + player.wrongAnswers > 0 &&
-          Math.round(
-            (player.rightAnswers /
-              (player.rightAnswers + player.wrongAnswers)) *
-              100
-          )}
-        {player && player.rightAnswers + player.wrongAnswers === 0 && '-'}%
-      </div>
-      <div>You KO'd {player && player.kills} players</div>
-      <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>
+        {gameState.playersLeft === 1 && player && (player.won || player.lost) && (
+        <>
+          <div>
+            {player &&
+              Math.round(
+                player.rightAnswers / (player.deathTime / 1000.0 / 60)
+              )}{' '}
+            WPM
+          </div>
+          <div>
+            Accuracy:{' '}
+            {player &&
+              player.rightAnswers + player.wrongAnswers > 0 &&
+              Math.round(
+                (player.rightAnswers /
+                  (player.rightAnswers + player.wrongAnswers)) *
+                  100
+              )}
+            {player && player.rightAnswers + player.wrongAnswers === 0 && '-'}%
+        </div>
+        <div>You KO'd {player && player.kills} players</div>
+        </>
+      )}
+      {(gameState.loadTime > 0) && (
+        <div>Next Game Starts In {Math.floor(gameState.loadTime / 1000)}</div>
+      )}
     </div>
   );
 }

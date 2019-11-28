@@ -28,14 +28,27 @@ const UNCONNECTED_GAME_STATE: GameState = new GameState(
   window.localStorage.getItem('playerid')
 );
 
+function getIngamePlayerView(player: Player): GameView {
+  if(player){
+    if(player.inGame){
+      return IngameView;
+    }
+    if(player.lost || player.won || player.ready){
+      return PostGameView;
+    }
+    return LobbyView;
+  }
+  return LobbyView;
+}
+
 const GameViewRenderers: { [GameView]: Function } = {
   UNCONNECTED: (player: ?Player) => UnconnectedView,
   POSTGAME: (player: ?Player) => PostGameView,
   LOBBY: (player: ?Player) => LobbyView,
-  INGAME: (player: ?Player) =>
-    player && ((player.inGame && (player.lost || player.won)) || !player.inGame)
-      ? PostGameView
-      : IngameView,
+  INGAME: (player: ?Player) => getIngamePlayerView(player),
+    // player && ((player.inGame && (player.lost || player.won)) || !player.inGame)
+    //   ? PostGameView
+    //   : IngameView,
 };
 
 let firstPass = true;
