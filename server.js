@@ -220,10 +220,6 @@ function resetGame(game) {
   for (const { name, id } of Object.values(game.players)) {
     game.players[id] = newPlayer(id);
     game.players[id].name = name;
-
-    if (name.length > 0) {
-      game.players[id].ready = true;
-    }
   }
 }
 
