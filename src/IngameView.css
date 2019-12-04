@@ -38,6 +38,21 @@
   font-size: 60px;
 }
 
+.IngameView-ShakeButton {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  flex: 1;
+  color: white;
+  display: inline-block;
+  font-size: 24px;
+  border: 1px solid #008080;
+  border-radius: 4px;
+  background-color: transparent;
+  text-align: center;
+  outline: none;
+}
+
 .IngameView-Letter-Untyped {
   color: white;
   font-size: 40px;

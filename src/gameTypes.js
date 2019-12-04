@@ -15,6 +15,8 @@ export type Player = {
   rightAnswers: number,
   wrongAnswers: number,
   timesAttacked: number,
+  canShake: boolean,
+  screenShakeUntilMs: number,
 };
 export type GameView = 'INGAME' | 'POSTGAME' | 'LOBBY' | 'UNCONNECTED';
 

@@ -107,7 +107,7 @@ function App() {
         />
       </div>
       <canvas id="canvas" />
-      <button
+      {/* <button
         className="App-FreezeStateBtn"
         onClick={() =>
           setIsReceivingGameState(!isReceivingGameState) &&
@@ -115,7 +115,7 @@ function App() {
         }
       >
         [Debug] {isReceivingGameState ? 'FREEZE' : 'UNFREEZE'}
-      </button>
+      </button> */}
     </div>
   );
 }

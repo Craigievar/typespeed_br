@@ -61,6 +61,10 @@ class GameNetwork {
     nullthrows(this._socket).emit('input', {word});
   }
 
+  sendShake() {
+    nullthrows(this._socket).emit('screen_shake', {});
+  }
+
   onStateUpdate(onChange: (gameState: GameState) => void) {
     const id = uuid();
     this._listeners[id] = onChange;

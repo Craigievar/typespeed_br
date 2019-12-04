@@ -12,6 +12,7 @@ import './IncorrectAnimation.css';
 import './AttackedAnimation.css';
 import useAnimation from './hooks/useAnimation';
 import isMobile from './isMobile';
+import classnames from 'classnames';
 
 type Props = {
   gameServer: GameNetwork,
@@ -46,14 +47,16 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
   const [attackingClassname, setAttackingClassname] = useState('');
   const [killedClassname, setKilledClassname] = useState('');
 
-  function queueClass(length: int): string {
-    if(length <= (WORDS_TO_LOSE / 2)){
+  const isScreenShaking = Date.now() < player.screenShakeUntilMs;
+
+  function queueClass(length: number): string {
+    if (length <= WORDS_TO_LOSE / 2) {
       return 'Safe';
     }
-    if(length <= (WORDS_TO_LOSE * 4.0 / 5.0)){
+    if (length <= (WORDS_TO_LOSE * 4.0) / 5.0) {
       return 'Warning';
     }
-    if(length > WORDS_TO_LOSE * 4.0 / 5.0){
+    if (length > (WORDS_TO_LOSE * 4.0) / 5.0) {
       return 'Danger';
     }
     return 'Fallthrough';
@@ -79,6 +82,11 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
           word = '';
           break;
 
+        // ~ or ` key
+        case event.keyCode === 192:
+          gameServer.sendShake();
+          break;
+
         default:
           break;
       }
@@ -87,7 +95,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
     },
     [inputValue, setInputValue]
   );
-  const onMobileSubmit = (e) => {
+  const onMobileSubmit = e => {
     gameServer.sendWord(inputValue);
     setInputValue('');
     e.preventDefault();
@@ -105,7 +113,9 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
 
   const correctFlash = useAnimation(
     () => {
-      return (player && player.rightAnswers && (player.rightAnswers > 0)) ? 'App-Correct' : null;
+      return player && player.rightAnswers && player.rightAnswers > 0
+        ? 'App-Correct'
+        : null;
     },
     300,
     [player.rightAnswers]
@@ -129,8 +139,9 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
   const attackedFlash = useAnimation(
     () => {
       return gameState.players[player.lastAttacker] &&
-        gameState.players[player.lastAttacker].name !== null ?
-        'IngameView-Attacked' : null;
+        gameState.players[player.lastAttacker].name !== null
+        ? 'IngameView-Attacked'
+        : null;
     },
     1000,
     [player.timesAttacked]
@@ -138,59 +149,64 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
 
   const killFlash = useAnimation(
     () => {
-      return player.lastKilled !== null ?
-        'IngameView-Killed' : null;
+      return player.lastKilled !== null ? 'IngameView-Killed' : null;
     },
     1500,
     [player.kills]
   );
 
-  useEffect(() => setShellClassName(correctFlash || incorrectFlash ), [
-    correctFlash,
-    incorrectFlash,
-  ]);
+  const screenShakeAnimation = useAnimation(
+    () => {
+      return isScreenShaking ? 'App-Shaking' : null;
+    },
+    5000,
+    [isScreenShaking]
+  );
+
+  useEffect(
+    () =>
+      setShellClassName(
+        classnames(correctFlash, incorrectFlash, screenShakeAnimation)
+      ),
+    [correctFlash, incorrectFlash, screenShakeAnimation]
+  );
   useEffect(() => {
     return () => {
       setShellClassName(null);
     };
   }, []);
 
-  useEffect(() => (setAttackingClassname(attackingFlash)), [
-    attackingFlash,
-  ]);
+  useEffect(() => setAttackingClassname(attackingFlash), [attackingFlash]);
   useEffect(() => {
     return () => {
       setAttackingClassname(null);
     };
   }, []);
 
-  useEffect(() => (setAttackedClassname(attackedFlash)), [
-    attackedFlash,
-  ]);
+  useEffect(() => setAttackedClassname(attackedFlash), [attackedFlash]);
   useEffect(() => {
     return () => {
       setAttackedClassname(null);
     };
   }, []);
 
-  useEffect(() => (setKilledClassname(attackedFlash)), [
-    attackedFlash,
-  ]);
+  useEffect(() => setKilledClassname(attackedFlash), [attackedFlash]);
   useEffect(() => {
     return () => {
       setAttackedClassname(null);
     };
   }, []);
 
-  useEffect(() => (setKilledClassname(killFlash)), [
-    killFlash,
-  ]);
+  useEffect(() => setKilledClassname(killFlash), [killFlash]);
   useEffect(() => {
     return () => {
       setKilledClassname(null);
     };
   }, []);
 
+  function onSendShake() {
+    gameServer.sendShake();
+  }
 
   return (
     <div>
@@ -207,7 +223,12 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
         <div className="IngameView-Container">
           <div className="IngameView-Stat">
             <span>Words in Queue: </span>
-            <span className={"IngameView-QueueLengthDisplay-" + queueClass(player.nextWords.length)}>
+            <span
+              className={
+                'IngameView-QueueLengthDisplay-' +
+                queueClass(player.nextWords.length)
+              }
+            >
               {player.nextWords.length}/{WORDS_TO_LOSE}
             </span>
           </div>
@@ -217,15 +238,11 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
           <div className="IngameView-Stat">KOs: {player.kills}</div>
           <div className="IngameView-Stat">
             <span>Words: </span>
-            <span className="IngameView-WordCount">
-              {player.rightAnswers}
-            </span>
+            <span className="IngameView-WordCount">{player.rightAnswers}</span>
           </div>
           <div className="IngameView-Stat">
             <span>Errors: </span>
-            <span className="IngameView-ErrorCount">
-              {player.wrongAnswers}
-            </span>
+            <span className="IngameView-ErrorCount">{player.wrongAnswers}</span>
           </div>
           <div className={attackingClassname}>
             <div className="IngameView-Target">
@@ -234,9 +251,10 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
           </div>
           <div className={attackedClassname}>
             <div className="IngameView-Targeter">
-              Attacked by {gameState.players[player.lastAttacker] &&
-                gameState.players[player.lastAttacker].name !== null
-                && gameState.players[player.lastAttacker].name}
+              Attacked by{' '}
+              {gameState.players[player.lastAttacker] &&
+                gameState.players[player.lastAttacker].name !== null &&
+                gameState.players[player.lastAttacker].name}
             </div>
           </div>
           <div className={killedClassname}>
@@ -270,9 +288,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
             </div>
           )}
           {isMobile() && (
-            <form
-              onSubmit={onMobileSubmit}
-            >
+            <form onSubmit={onMobileSubmit}>
               <input
                 type="text"
                 autoFocus="true"
@@ -282,11 +298,19 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
               />
             </form>
           )}
+          {player.canShake && (
+            <button className="IngameView-ShakeButton" onClick={onSendShake}>
+              SHAKE OPPONENT (~)
+            </button>
+          )}
           <div className="IngameView-Queue">
             <span className="IngameView-Letter-Queue">
               {player.nextWords.length > 1 &&
                 player.nextWords
-                  .slice(isMobile() ? 0 : 1, Math.min(player.nextWords.length, WORDS_TO_SHOW))
+                  .slice(
+                    isMobile() ? 0 : 1,
+                    Math.min(player.nextWords.length, WORDS_TO_SHOW)
+                  )
                   .map(d => (
                     <p className="IngameView-Queue-Border">{d.toLowerCase()}</p>
                   ))}

@@ -98,6 +98,8 @@ function newPlayer(id) {
     winner: '',
     deathTime: 1,
     timesAttacked: 0,
+    canShake: true,
+    screenShakeUntilMs: 0,
   };
 }
 
@@ -313,6 +315,26 @@ io.on('connection', function(socket) {
     if (gameState.state === 'INGAME') {
       const player = gameState.players[socket.id] || {};
       checkInput(data.word, player, socket.id);
+    }
+  });
+
+  socket.on('screen_shake', data => {
+    if (gameState.players[socket.id].canShake) {
+      gameState.players[socket.id].canShake = false;
+
+      // CD for the screen shake
+      setTimeout(() => {
+        gameState.players[socket.id].canShake = true;
+      }, 30000);
+
+      // Shake everyone elses screens
+      const currentTime = Date.now();
+      const otherPlayers = Object.entries(gameState.players).filter(
+        ([id, player]) => id !== socket.id
+      );
+      otherPlayers.forEach(([id, player]) => {
+        player.screenShakeUntilMs = currentTime + 5000;
+      });
     }
   });
 });
