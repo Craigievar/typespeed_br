@@ -259,7 +259,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
           </div>
           <div className={killedClassname}>
             <div className="IngameView-Kill-Target">
-              Killed {player.lastKilled} {player.kills}
+              Killed {player.lastKilled}
             </div>
           </div>
           <br></br>
