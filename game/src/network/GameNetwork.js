@@ -41,7 +41,21 @@ class GameNetwork {
       return;
     }
 
-    const socket: ?Socket = io(address);
+    let room = null;
+    window.location.search
+      .substr(1)
+      .split("&")
+      .forEach(function (item) {
+        const tmp = item.split("=");
+        if (tmp[0].toLowerCase() === "room") {
+          room = tmp[1];
+        }
+      });
+
+    const socket: ?Socket = room && /^\d+$/.test(room) ?
+      io(address, {query:"room=" + room}) :
+      io(address);
+    // const socket: ?Socket = io(address, {query:"room=1"});
     if (socket) {
       this._socket = socket;
       socket.emit('new player');
