@@ -1,7 +1,10 @@
+// @flow
 /*
   Basically, we want to refactor win checks, etc.
   out of player actions (just update to track state there)
 */
+
+import type {Player} from '../../game/src/gameTypes';
 
 // Unpack config file
 const config = require('./config');
@@ -73,7 +76,7 @@ function randomWord() {
   return randomElement(WORDS);
 }
 
-function checkIfLost(player) {
+function checkIfLost(player: Player) {
   if (player && player.nextWords.length >= WORDS_TO_LOSE) {
     return true;
   }
