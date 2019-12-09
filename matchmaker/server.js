@@ -25,11 +25,11 @@ app.post('/join', function(req, res) {
         const playersToJoin = waitingPlayers.slice();
         waitingPlayers = [];
 
-        // const serverUrl = await superagent
-        //   .post(
-        //     `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}/create_game`
-        //   )
-        //   .query({ num_players: playersToJoin.length });
+        const serverUrl = await superagent
+          .post(
+            `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}/create_game`
+          )
+          .send({ num_players: playersToJoin.length });
 
         // Write out a successful game_created message to all players that
         // will be joining the game, along with
