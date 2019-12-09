@@ -25,13 +25,22 @@ function LobbyView({ gameServer, gameState }: Props) {
 
     setIsWaiting(true);
   }
-  
+
   return (
     <div className="LobbyView-Container">
       {isWaiting && !showInstructions && (
         <div className="LobbyView-Waiting">
           <AnimatedText animation="pulse">
-            Waiting for {gameState.playersNeeded} more players
+            {gameState.playersNeeded > 0 && (
+              <>
+                Waiting for {gameState.playersNeeded} more players
+              </>
+            )}
+            {gameState.playersNeeded <= 0 && (
+              <>
+                Waiting for names!
+              </>
+            )}
           </AnimatedText>
         </div>
       )}
