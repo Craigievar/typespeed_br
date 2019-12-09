@@ -331,7 +331,7 @@ io.on('connection', function(socket) {
     if (gamesOnServer[room]) {
       delete gamesOnServer[room].players[socket.id];
       if (numPlayers(gamesOnServer[room]) <= 0) {
-        delete gamesOnServer[room];
+        setTimeout(delete gamesOnServer[room], 3000);
       }
     }
   });
@@ -390,8 +390,10 @@ setInterval(function() {
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
       console.log(gamesOnServer[game]);
-      updateGameState(gamesOnServer[game]);
-      io.to(game).emit('state', gamesOnServer[game]);
+      if(numPlayers(gamesOnServer[game]) > 0){
+        updateGameState(gamesOnServer[game]);
+        io.to(game).emit('state', gamesOnServer[game]);
+      }
     }
   }
 }, 1000 / 60);
