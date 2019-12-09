@@ -165,7 +165,6 @@ function numPlayers(game) {
   if (game && game.players) {
     for (const id in game.players) {
       if(id) {
-        console.log(id);
         players++;
       }
     }
@@ -257,7 +256,6 @@ function updateGameState(game) {
   const time = Date.now();
   const deltaTime = time - game.lastTickTimeMs;
   game.lastTickTimeMs = time;
-  console.log(numPlayers(game));
 
   if (game.state === 'LOBBY') {
     const playersReady = numReadyPlayers(game);
@@ -318,6 +316,7 @@ io.on('connection', function(socket) {
   socket.on('new player', function() {
     const room = socket.handshake.query.room ?
       socket.handshake.query.room.toString() : '0';
+    console.log(room);
     socket.join(room);
     if(!gamesOnServer[room]){
       gamesOnServer[room] = newGame(room);
@@ -390,7 +389,7 @@ io.on('connection', function(socket) {
 setInterval(function() {
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
-      //console.log(gamesOnServer[game]);
+      console.log(gamesOnServer[game]);
       updateGameState(gamesOnServer[game]);
       io.to(game).emit('state', gamesOnServer[game]);
     }
