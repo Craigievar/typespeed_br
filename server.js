@@ -50,6 +50,10 @@ server.listen(port, function() {
 const gamesOnServer = {
 };
 
+// when users disconnect we lose their socket.
+const playerRoomMap = {
+};
+
 // Initialize the game state when we start the server
 function newGame(room) {
   return {
@@ -318,6 +322,7 @@ io.on('connection', function(socket) {
       socket.handshake.query.room.toString() : '0';
     console.log(room);
     socket.join(room);
+    playerRoomMap[socket.id] = room;
     if(!gamesOnServer[room]){
       gamesOnServer[room] = newGame(room);
     }
@@ -325,13 +330,16 @@ io.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function() {
-    console.log('deleting ' + socket.id);
-    //let idToDelete = socket.id
-    const room = getRoom(socket);
+    console.log('deleting ' + socket.id + ' from room ' + playerRoomMap[socket.id]);
+    const room = playerRoomMap[socket.id];
     if (gamesOnServer[room]) {
       delete gamesOnServer[room].players[socket.id];
+      delete playerRoomMap[socket.id];
       if (numPlayers(gamesOnServer[room]) <= 0) {
-        setTimeout(delete gamesOnServer[room], 3000);
+        setTimeout(function() {
+          delete gamesOnServer[room];
+          console.log('deleting game ' + room);
+        }, 3000);
       }
     }
   });
@@ -389,7 +397,7 @@ io.on('connection', function(socket) {
 setInterval(function() {
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
-      console.log(gamesOnServer[game]);
+      // console.log(gamesOnServer[game]);
       if(numPlayers(gamesOnServer[game]) > 0){
         updateGameState(gamesOnServer[game]);
         io.to(game).emit('state', gamesOnServer[game]);
