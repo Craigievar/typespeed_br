@@ -4,12 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start-game-server": "node server.js",
-    "start": "REACT_APP_GAME_SERVER_PORT=8080 react-scripts start",
-    "build": "react-scripts build",
-    "build-ig": "REACT_APP_GAME_SERVER_URI=https://infinite-hamlet-91503.herokuapp.com/ react-scripts build && zip -r build.zip build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "build": "babel src/ -d build/",
+    "start-local": "NODE_ENV=development babel-node src/server.js",
+    "start": "NODE_ENV=production node build/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +24,9 @@
     "node": "11.11.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.5",
+    "@babel/node": "^7.7.4",
+    "@babel/preset-flow": "^7.7.4",
     "flow-bin": "^0.103.0",
     "prettier": "^1.18.2"
   },

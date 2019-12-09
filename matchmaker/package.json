@@ -4,7 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start-local": "GAME_INSTANCE_MANAGER_SERVICE_HOST=localhost GAME_INSTANCE_MANAGER_SERVICE_PORT=8082 node server.js"
+    "build": "babel src/ -d build/",
+    "start": "NODE_ENV=production node build/server.js",
+    "start-local": "NODE_ENV=development GAME_INSTANCE_MANAGER_SERVICE_HOST=localhost GAME_INSTANCE_MANAGER_SERVICE_PORT=8082 babel-node src/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +19,9 @@
     "node": "11.11.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.5",
+    "@babel/node": "^7.7.4",
+    "@babel/preset-flow": "^7.7.4",
     "flow-bin": "^0.103.0",
     "prettier": "^1.18.2"
   },
