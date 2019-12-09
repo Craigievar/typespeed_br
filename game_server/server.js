@@ -14,8 +14,6 @@ const MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START;
 const COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH;
 const RESET_LENGTH = config.RESET_LENGTH;
 const PLAYERS_TO_WIN = config.PLAYERS_TO_WIN;
-// console.log(RESET_LENGTH);
-// console.log(PLAYERS_TO_WIN);
 
 // Dependencies
 const express = require('express');
@@ -26,16 +24,11 @@ const server = http.Server(app); // eslint-disable-line new-cap
 const io = socketIO(server);
 const path = require('path');
 
-app.use(express.static(path.join(__dirname, 'build')));
 app.get('/ping', function (req, res) {
  return res.send('pong');
 });
 
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8081;
 app.set('port', port);
 // app.listen(port);
 
