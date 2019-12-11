@@ -54,4 +54,12 @@ app.post('/join', function(req, res) {
   });
 });
 
+app.get('/ping', function(req, res) {
+  console.log('[matchmaker] ping');
+
+  res.json({
+    ping: true
+  });
+});
+
 app.listen(port);

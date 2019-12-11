@@ -11,11 +11,17 @@ const port = process.env.PORT || 8082;
 app.post('/create_game', function(req, res) {
   console.log('[game_instance_manager] Create game request: ', req.body);
 
-  response.json({
+  res.json({
     server_url: 'http://localhost:8083',
   });
-  response.set(200);
-  response.end();
+});
+
+app.get('/ping', function(req, res) {
+  console.log('[game_instance_manager] ping');
+
+  res.json({
+    ping: true
+  });
 });
 
 app.listen(port);
