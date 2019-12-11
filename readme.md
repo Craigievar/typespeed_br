@@ -1,15 +1,19 @@
 A battle royale where you have to out-type your opponents
 
-## Starting the web server [dev]
+## Starting the stack locally
 
-`npm run start`
+`./run_local.sh`
 
-## Starting the game server
+This starts all of the services, attaches file watchers, and runs them using
+the default local config. Each service
 
-`npm run start-game-server`
+## NPM commands
 
-![Update - React Version](https://github.com/Craigievar/typespeed_br/blob/master/static/eximg2.png)
+Each of the services conforms to the same pattern of npm commands to run:
 
+| build | Builds the app using babel, and dumps it into the `/build` folder |
+| start | Runs the built app, found in the `/build` folder |
+| start-local | Runs the server in dev mode, and attaches file watchers for restarting on file save. |
 
 ## Local Development
 
