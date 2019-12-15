@@ -23,7 +23,7 @@ const port = process.env.PORT || 8082;
 
 app.post('/create_game', function(req, res) {
   res.json({
-    server_url: 'http://localhost:8083',
+    server_url: `${process.env.GAME_SERVER_SERVICE_HOST}:${process.env.GAME_SERVER_SERVICE_PORT}`,
   });
 });
 
