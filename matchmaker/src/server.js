@@ -34,9 +34,7 @@ io.on('connection', function(socket) {
     // then cancel the countdown for match requesting.
     if (waitingPlayers.length < 2) {
       clearTimeout(flushPlayerTimeoutID);
-      io.in(joinedMatchID).emit('game_creation_cancelled', {
-        server_url: 'localhost:8083',
-      });
+      io.in(joinedMatchID).emit('game_creation_cancelled');
     }
   });
 
@@ -47,9 +45,7 @@ io.on('connection', function(socket) {
     console.log('[matchmaker] Player join request: ', player);
 
     if (waitingPlayers.length >= 2) {
-      io.in(joinedMatchID).emit('requesting_game', {
-        server_url: 'localhost:8083',
-      });
+      io.in(joinedMatchID).emit('requesting_game');
 
       flushPlayerTimeoutID =
         flushPlayerTimeoutID ||
@@ -75,6 +71,7 @@ io.on('connection', function(socket) {
     io.in(joinedMatchID).emit('player_joined', {
       player_name: player.name,
       player_count: waitingPlayers.length,
+      players_needed: 2,
     });
   });
 });
@@ -85,4 +82,7 @@ app.get('/ping', function(req, res) {
   });
 });
 
-app.listen(port);
+// app.listen(port);
+server.listen(port, function() {
+  console.log('Starting server on port' + (port));
+});
