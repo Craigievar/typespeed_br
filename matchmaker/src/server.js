@@ -10,6 +10,8 @@ const uuid = require('tiny-uuid');
 const server = http.Server(app); // eslint-disable-line new-cap
 const io = socketIO(server);
 
+const MIN_PLAYERS = 2;
+
 app.use(express.json());
 app.use(cors());
 
@@ -22,39 +24,46 @@ let flushPlayerTimeoutID = null;
 let currentMatchID = uuid();
 
 io.on('connection', function(socket) {
-  const player = { ready: false, socket_id: socket.id };
+  const player = { ready: false, socket_id: socket.id, match_id: null };
   const joinedMatchID = currentMatchID;
   waitingPlayers.push(player);
-  socket.join(joinedMatchID);
 
   socket.on('disconnect', function() {
     waitingPlayers = waitingPlayers.filter(p => p !== player);
 
     // If a player leaving the queue makes it ineligible to request a match,
     // then cancel the countdown for match requesting.
-    if (waitingPlayers.length < 2) {
+    const readyPlayers = waitingPlayers.filter(p => p.ready);
+    if (readyPlayers.length < MIN_PLAYERS) {
       clearTimeout(flushPlayerTimeoutID);
-      io.in(joinedMatchID).emit('game_creation_cancelled');
+
+      if (player.match_ids) {
+        io.in(player.match_id).emit('game_creation_cancelled');
+      }
     }
   });
 
   socket.on('name', function(name) {
+    // Join the match room for the socket, now that they are readied up
+    socket.join(currentMatchID);
+    player.match_id = currentMatchID;
     player.name = name;
     player.ready = true;
 
     console.log('[matchmaker] Player join request: ', player);
 
-    if (waitingPlayers.length >= 2) {
-      io.in(joinedMatchID).emit('requesting_game');
+    const readyPlayers = waitingPlayers.filter(p => p.ready);
+    if (readyPlayers.length >= MIN_PLAYERS) {
+      io.in(player.match_id).emit('requesting_game');
 
       flushPlayerTimeoutID =
         flushPlayerTimeoutID ||
         setTimeout(async () => {
-          const playersToJoin = waitingPlayers.slice();
+          const playersToJoin = waitingPlayers.filter(p => p.ready);
 
           // Reset the matchmaking state
           currentMatchID = uuid();
-          waitingPlayers = [];
+          waitingPlayers = waitingPlayers.filter(p => !p.ready);
           flushPlayerTimeoutID = null;
 
           console.log('[matchmaker] Requesting game creation from ', `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`);
@@ -65,15 +74,15 @@ io.on('connection', function(socket) {
             .send({ num_players: playersToJoin.length });
 
           // Notify everyone that a match has been succesfully created
-          io.in(joinedMatchID).emit('game_created', { server_url: serverUrl.body.server_url });
+          io.in(player.match_id).emit('game_created', { server_url: serverUrl.body.server_url });
         }, 100);
     }
 
     // Inform all the waiting players that this person has joined the lobby
-    io.in(joinedMatchID).emit('player_joined', {
+    io.in(player.match_id).emit('player_joined', {
       player_name: player.name,
       player_count: waitingPlayers.length,
-      players_needed: 2,
+      players_needed: MIN_PLAYERS,
     });
   });
 });
