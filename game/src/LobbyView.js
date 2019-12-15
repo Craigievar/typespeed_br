@@ -19,9 +19,28 @@ function LobbyView({ gameServer, gameState }: Props) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
 
-  function handleSubmit(e) {
-    gameServer.joinGame(playerName);
+  async function handleSubmit(e) {
+    // gameServer.joinGame(playerName);
     e.preventDefault();
+
+    const matchmakingUri = new URL(process.env.REACT_APP_MATCHMAKER_SERVICE_HOST);
+    matchmakingUri.port = process.env.REACT_APP_MATCHMAKER_SERVICE_PORT;
+
+    // const response = await window.fetch(`${matchmakingUri.href}join`, {
+    //   method: 'post',
+    //   mode: 'cors',
+    //   headers: {
+    //     'Access-Control-Allow-Origin':'*'
+    //   },
+    //   body:
+    // });
+    const xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
+    xhr.open('POST', `${matchmakingUri.href}join`, true);
+    xhr.onload = e => console.log(e);
+    xhr.send(JSON.stringify({
+      name: playerName
+    }));
 
     setIsWaiting(true);
   }

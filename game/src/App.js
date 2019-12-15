@@ -13,6 +13,7 @@ import UnconnectedView from './UnconnectedView';
 import useGameServer from './network/useGameServer';
 import useLocalStorage from './hooks/useLocalStorage';
 import classnames from 'classnames';
+import GameNetwork from './network/GameNetwork';
 
 const { useEffect, useState } = React;
 
@@ -46,15 +47,13 @@ const GameViewRenderers: { [GameView]: Function } = {
   POSTGAME: (player: ?Player) => PostGameView,
   LOBBY: (player: ?Player) => LobbyView,
   INGAME: (player: ?Player) => getIngamePlayerView(player),
-    // player && ((player.inGame && (player.lost || player.won)) || !player.inGame)
-    //   ? PostGameView
-    //   : IngameView,
 };
 
 let firstPass = true;
 
 function App() {
-  const gameServer = useGameServer();
+  // const gameServer = useGameServer();
+  const gameServer = new GameNetwork();
 
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
@@ -69,6 +68,8 @@ function App() {
   const [gameState, setGameState] = useState(
     new GameState(storedGameState, playerID)
   );
+  gameState.state = 'LOBBY';
+
 
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {

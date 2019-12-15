@@ -12,7 +12,9 @@
   "license": "ISC",
   "homepage": ".",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.16.4",
+    "socket.io": "^2.3.0",
     "superagent": "^5.1.2"
   },
   "engines": {
