@@ -52,7 +52,7 @@ const GameViewRenderers: { [GameView]: Function } = {
 let firstPass = true;
 
 function App() {
-  const gameServer = new GameNetwork();
+  const gameServer = useGameServer();
 
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
@@ -75,7 +75,7 @@ function App() {
 
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
-      console.log('updating');
+      console.log('updating', updatedGameState, isReceivingGameState);
       if (isReceivingGameState) {
         setGameState(updatedGameState);
       }

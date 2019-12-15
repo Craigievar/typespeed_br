@@ -263,7 +263,7 @@ function updateGameState(game) {
     if (playersReady >= MIN_PLAYERS_TO_START &&
         playersReady >= numPlayers(game)) {
       //start game!
-      console.log('[game_server]', 'starting game');
+      console.log('[game_server]', 'updateGameState starting game', game);
       game.state = 'INGAME';
       game.inCountdown = true;
 
@@ -369,6 +369,8 @@ io.on('connection', function(socket) {
   });
 
   socket.on('screen_shake', data => {
+    const room = getRoom(socket);
+    const gameState = gamesOnServer[room];
     if (gameState.players[socket.id].canShake) {
       gameState.players[socket.id].canShake = false;
 
@@ -393,7 +395,6 @@ io.on('connection', function(socket) {
 setInterval(function() {
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
-      // console.log('[game_server]', gamesOnServer[game]);
       if(numPlayers(gamesOnServer[game]) > 0){
         updateGameState(gamesOnServer[game]);
         io.to(game).emit('state', gamesOnServer[game]);
