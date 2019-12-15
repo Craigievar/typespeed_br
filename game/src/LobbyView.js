@@ -32,12 +32,15 @@ function LobbyView({ gameServer, gameState }: Props) {
     matchmakingServer.connectToAddress(matchmakingUri.href);
 
     return matchmakingServer.onChange((e) => {
+      console.log(e);
       switch (e.type) {
         case 'game_creation_cancelled':
           break;
         case 'requesting_game':
           break;
         case 'game_created':
+          gameServer.connectToAddress(e.server_url);
+          gameServer.joinGame(playerName);
           break;
         case 'player_joined':
           setPlayerCount(e.player_count);
@@ -47,7 +50,7 @@ function LobbyView({ gameServer, gameState }: Props) {
           break;
       }
     });
-  }, [matchmakingServer]);
+  }, [matchmakingServer, playerName]);
 
   async function handleSubmit(e) {
     matchmakingServer.joinGame(playerName);

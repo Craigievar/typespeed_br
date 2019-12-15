@@ -39,7 +39,7 @@ app.set('port', port);
 
 // Start the server.
 server.listen(port, function() {
-  console.log('Starting server on port' + (port));
+  console.log('[game_server]', 'Starting server on port' + (port));
 });
 
 // Map of socket channels to games
@@ -174,9 +174,9 @@ function numPlayers(game) {
 
 function checkForWinner(game) {
   if (updatePlayersLeft(game) <= PLAYERS_TO_WIN) {
-    console.log('Reset game');
+    console.log('[game_server]', 'Reset game');
     game.loadTime = RESET_LENGTH;
-    console.log('reset length is ' + RESET_LENGTH);
+    console.log('[game_server]', 'reset length is ' + RESET_LENGTH);
     game.state = 'POSTGAME';
     if (game.endTime === 0) {
       game.endTime = game.time;
@@ -195,7 +195,7 @@ function checkInput(word, player, id) {
   if (!word) {
     return;
   }
-  // console.log(word);
+  // console.log('[game_server]', word);
   if (word.toLowerCase() === player.nextWords[0].toLowerCase()) {
     player.rightAnswers++;
     player.nextWords.shift();
@@ -263,7 +263,7 @@ function updateGameState(game) {
     if (playersReady >= MIN_PLAYERS_TO_START &&
         playersReady >= numPlayers(game)) {
       //start game!
-      console.log('starting game');
+      console.log('[game_server]', 'starting game');
       game.state = 'INGAME';
       game.inCountdown = true;
 
@@ -316,7 +316,7 @@ io.on('connection', function(socket) {
   socket.on('new player', function() {
     const room = socket.handshake.query.room ?
       socket.handshake.query.room.toString() : '0';
-    console.log(room);
+    console.log('[game_server]', room);
     socket.join(room);
     playerRoomMap[socket.id] = room;
     if(!gamesOnServer[room]){
@@ -326,7 +326,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function() {
-    console.log('deleting ' + socket.id + ' from room ' + playerRoomMap[socket.id]);
+    console.log('[game_server]', 'deleting ' + socket.id + ' from room ' + playerRoomMap[socket.id]);
     const room = playerRoomMap[socket.id];
     if (gamesOnServer[room]) {
       delete gamesOnServer[room].players[socket.id];
@@ -334,25 +334,25 @@ io.on('connection', function(socket) {
       if (numPlayers(gamesOnServer[room]) <= 0) {
         setTimeout(function() {
           delete gamesOnServer[room];
-          console.log('deleting game ' + room);
+          console.log('[game_server]', 'deleting game ' + room);
         }, 3000);
       }
     }
   });
 
   socket.on('name', function(data) {
-    console.log('got name! ' + data.word);
+    console.log('[game_server]', 'got name! ', data);
     const room = getRoom(socket);
     gamesOnServer[room].players[socket.id].name = data.word;
     gamesOnServer[room].players[socket.id].ready = true;
   });
 
   socket.on('start', function(data) {
-    console.log('starting game');
+    console.log('[game_server]', 'starting game');
     const room = getRoom(socket);
     gamesOnServer[room].state = 'INGAME';
     gamesOnServer[room].inCountdown = true;
-    console.log('players: ', gamesOnServer[room].players);
+    console.log('[game_server]', 'players: ', gamesOnServer[room].players);
     for (const player of Object.values(gamesOnServer[room].players)) {
       if(player.ready) {
         player.inGame = true;
@@ -393,7 +393,7 @@ io.on('connection', function(socket) {
 setInterval(function() {
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
-      // console.log(gamesOnServer[game]);
+      // console.log('[game_server]', gamesOnServer[game]);
       if(numPlayers(gamesOnServer[game]) > 0){
         updateGameState(gamesOnServer[game]);
         io.to(game).emit('state', gamesOnServer[game]);

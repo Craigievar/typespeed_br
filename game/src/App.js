@@ -52,7 +52,6 @@ const GameViewRenderers: { [GameView]: Function } = {
 let firstPass = true;
 
 function App() {
-  // const gameServer = useGameServer();
   const gameServer = new GameNetwork();
 
   const [storedGameState, setStoredGameState] = useLocalStorage(
@@ -68,11 +67,15 @@ function App() {
   const [gameState, setGameState] = useState(
     new GameState(storedGameState, playerID)
   );
-  gameState.state = 'LOBBY';
 
+  // Hack until we fix game state to not be controlled by the game server
+  useEffect(() => {
+    gameState.state = 'LOBBY';
+  }, []);
 
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
+      console.log('updating');
       if (isReceivingGameState) {
         setGameState(updatedGameState);
       }

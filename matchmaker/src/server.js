@@ -55,16 +55,18 @@ io.on('connection', function(socket) {
           // Reset the matchmaking state
           currentMatchID = uuid();
           waitingPlayers = [];
+          flushPlayerTimeoutID = null;
 
+          console.log('[matchmaker] Requesting game creation from ', `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`);
           const serverUrl = await superagent
             .post(
-              `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}/create_game`
+              `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`
             )
             .send({ num_players: playersToJoin.length });
 
           // Notify everyone that a match has been succesfully created
-          io.in(joinedMatchID).emit('game_created', { server_url: serverUrl });
-        }, 10000);
+          io.in(joinedMatchID).emit('game_created', { server_url: serverUrl.body.server_url });
+        }, 100);
     }
 
     // Inform all the waiting players that this person has joined the lobby
