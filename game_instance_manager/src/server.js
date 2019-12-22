@@ -22,6 +22,8 @@ app.use(express.json());
 const port = process.env.PORT || 8082;
 
 app.post('/create_game', function(req, res) {
+  console.log('[game_instance_manager]: Server on ' +
+    `${process.env.GAME_SERVER_SERVICE_HOST}:${process.env.GAME_SERVER_SERVICE_PORT}`);
   res.json({
     server_url: process.env.GAME_SERVER_SERVICE,
   });

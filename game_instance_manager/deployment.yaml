@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: game-instance-manager
+spec:
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        role: game-instance-manager-server
+    spec:
+      nodeSelector:
+        role: apps
+      containers:
+      - name: game-instance-manager
+        image: gcr.io/${PROJECT}/game-instance-manager
+        imagePullPolicy: Always
+        readinessProbe:
+            httpGet:
+                path: /ping
+                port: 8080
+                scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 3
+        env:
+          - name: GAME_SERVER_SERVICE
+            value: "http://game-server"
+        ports:
+        - containerPort: 8080
