@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel src/ -d build/",
     "start": "NODE_ENV=production node build/server.js",
-    "start-local": "NODE_ENV=development GAME_INSTANCE_MANAGER_SERVICE_HOST=localhost GAME_INSTANCE_MANAGER_SERVICE_PORT=8082 babel-watch src/server.js"
+    "start-local": "NODE_ENV=development GAME_INSTANCE_MANAGER_SERVICE=http://localhost:8082 babel-watch src/server.js"
   },
   "author": "",
   "license": "ISC",

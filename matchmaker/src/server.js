@@ -68,9 +68,7 @@ io.on('connection', function(socket) {
 
           console.log('[matchmaker] Requesting game creation from ', `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`);
           const serverUrl = await superagent
-            .post(
-              `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`
-            )
+            .post(`${process.env.GAME_INSTANCE_MANAGER_SERVICE}/create_game`)
             .send({ num_players: playersToJoin.length });
 
           // Notify everyone that a match has been succesfully created

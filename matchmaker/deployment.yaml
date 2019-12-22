@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: matchmaker
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: matchmaker-server
+    spec:
+      nodeSelector:
+        role: apps
+      containers:
+      - name: matchmaker
+        image: gcr.io/${PROJECT}/matchmaker
+        imagePullPolicy: Always
+        readinessProbe:
+            httpGet:
+                path: /ping
+                port: 8080
+                scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 3
+        env:
+          - name: GAME_INSTANCE_MANAGER_SERVICE
+            value: "http://game_instance_manager"
+        ports:
+        - containerPort: 8080
