@@ -8,4 +8,4 @@ spec:
   - port: 80
     targetPort: 8080
   selector:
-    role: game-instance-manager-pod
+    podname: game-instance-manager-pod
