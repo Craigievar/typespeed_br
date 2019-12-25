@@ -8,5 +8,5 @@ spec:
   - port: 80
     targetPort: 8080
   selector:
-    podname: matchmaker-pod
+    role: matchmaker-pod
   type: LoadBalancer

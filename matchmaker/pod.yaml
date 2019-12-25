@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: matchmaker
-  podname: matchmaker-pod
+  role: matchmaker-pod
 spec:
   hostNetwork: true
   restartPolicy: Never
