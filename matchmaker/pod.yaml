@@ -16,3 +16,4 @@ spec:
       env:
         - name: SESSION_NAME
           value: "matchmaker"
+      port: 80
