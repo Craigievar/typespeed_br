@@ -9,3 +9,4 @@ spec:
     targetPort: 8080
   selector:
     role: game-assets-server
+  type: LoadBalancer
