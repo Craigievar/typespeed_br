@@ -72,17 +72,17 @@ function App() {
   useEffect(() => {
     gameState.state = 'LOBBY';
   }, []);
-  //
-  // useEffect(() => {
-  //   const unsub = gameServer.onStateUpdate(updatedGameState => {
-  //     console.log('updating', updatedGameState, isReceivingGameState);
-  //     if (isReceivingGameState) {
-  //       setGameState(updatedGameState);
-  //     }
-  //   });
-  //
-  //   return () => unsub();
-  // }, [isReceivingGameState, gameServer]);
+  
+  useEffect(() => {
+    const unsub = gameServer.onStateUpdate(updatedGameState => {
+      console.log('updating', updatedGameState, isReceivingGameState);
+      if (isReceivingGameState) {
+        setGameState(updatedGameState);
+      }
+    });
+
+    return () => unsub();
+  }, [isReceivingGameState, gameServer]);
 
   useEffect(() => {
     if (!isReceivingGameState && !firstPass) {
