@@ -17,7 +17,7 @@ spec:
         - name: SESSION_NAME
           value: "game-instance-manager-server"
         - name: GAME_SERVER_SERVICE_HOST
-          value: "34.83.251.24:80"
+          value: "34.83.251.24"
         - name: GAME_SERVER_SERVICE_PORT
           value: "7008"
         - name: GAME_SERVER_SERVICE
