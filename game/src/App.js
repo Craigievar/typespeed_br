@@ -53,7 +53,7 @@ let firstPass = true;
 
 function App() {
   const gameServer = useGameServer();
-
+  console.log('Connecting to MM @ ' + process.env.REACT_APP_MATCHMAKER_SERVICE);
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
     UNCONNECTED_GAME_STATE
