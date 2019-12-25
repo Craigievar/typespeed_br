@@ -8,5 +8,5 @@ spec:
   - port: 80
     targetPort: 8080
   selector:
-    role: game-assets-server
+    role: game-assets-pod
   type: LoadBalancer

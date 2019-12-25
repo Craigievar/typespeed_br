@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: game-assets
-  role: game-assets-server
+  role: game-assets-pod
 spec:
   hostNetwork: true
   restartPolicy: Never
