@@ -27,9 +27,10 @@ function LobbyView({ gameServer, gameState }: Props) {
   const [playersNeeded, setPlayersNeeded] = useState(0);
 
   useEffect(() => {
-    const matchmakingUri = new URL(process.env.REACT_APP_MATCHMAKER_SERVICE);
+    //const matchmakingUri = new URL(process.env.REACT_APP_MATCHMAKER_SERVICE);
+    const matchmakingUri = new URL("http://34.82.145.79:80");
     matchmakingServer.connectToAddress(matchmakingUri.href);
-
+    console.log(matchmakingUri);
     return matchmakingServer.onChange((e) => {
       console.log(e);
       switch (e.type) {
@@ -58,8 +59,6 @@ function LobbyView({ gameServer, gameState }: Props) {
     setIsWaiting(true);
   }
 
-  console.log('Connecting to MM @ ' + process.env.REACT_APP_MATCHMAKER_SERVICE);
-  
   return (
     <div className="LobbyView-Container">
       {isWaiting && !showInstructions && (

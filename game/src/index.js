@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 
 console.log('public url: ', process.env.PUBLIC_URL);
+console.log(process.env);
 console.log('Connecting to MM @ ' + process.env.REACT_APP_MATCHMAKER_SERVICE);
 
 if (process.env.REACT_APP_GAME_SERVER_URI !== undefined) {

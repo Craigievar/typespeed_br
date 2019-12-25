@@ -21,7 +21,7 @@ const UNCONNECTED_GAME_STATE: GameState = new GameState(
   {
     players: {},
     playersNeeded: 0,
-    state: 'UNCONNECTED',
+    state: 'LOBBY',
     playersLeft: 0,
     endTime: 0,
     loadTime: 0,
@@ -72,17 +72,17 @@ function App() {
   useEffect(() => {
     gameState.state = 'LOBBY';
   }, []);
-
-  useEffect(() => {
-    const unsub = gameServer.onStateUpdate(updatedGameState => {
-      console.log('updating', updatedGameState, isReceivingGameState);
-      if (isReceivingGameState) {
-        setGameState(updatedGameState);
-      }
-    });
-
-    return () => unsub();
-  }, [isReceivingGameState, gameServer]);
+  //
+  // useEffect(() => {
+  //   const unsub = gameServer.onStateUpdate(updatedGameState => {
+  //     console.log('updating', updatedGameState, isReceivingGameState);
+  //     if (isReceivingGameState) {
+  //       setGameState(updatedGameState);
+  //     }
+  //   });
+  //
+  //   return () => unsub();
+  // }, [isReceivingGameState, gameServer]);
 
   useEffect(() => {
     if (!isReceivingGameState && !firstPass) {
@@ -97,6 +97,8 @@ function App() {
   const player = gameState.getPlayer();
   const View = GameViewRenderers[gameState.state](player);
   const [shellClassName, setShellClassName] = useState(null);
+
+  console.log(gameState.state);
 
   return (
     <div className={classnames('App', shellClassName)}>
