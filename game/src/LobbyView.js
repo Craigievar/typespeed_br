@@ -27,6 +27,7 @@ function LobbyView({ gameServer, gameState }: Props) {
   const [playersNeeded, setPlayersNeeded] = useState(0);
 
   useEffect(() => {
+    console.log('Connecting to MM @ ' + REACT_APP_MATCHMAKER_SERVICE);
     const matchmakingUri = new URL(process.env.REACT_APP_MATCHMAKER_SERVICE);
     matchmakingServer.connectToAddress(matchmakingUri.href);
 
