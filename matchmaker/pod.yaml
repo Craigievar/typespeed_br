@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: matchmaker
+spec:
+  hostNetwork: true
+  restartPolicy: Never
+  nodeSelector:
+    role: matchmaker
+  containers:
+    - name: matchmaker
+      image: gcr.io/tsbr-cluster-demo/matchmaker:v0
+      imagePullPolicy: Always
+      env:
+        - name: SESSION_NAME
+          value: "matchmaker"
