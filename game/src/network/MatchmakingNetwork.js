@@ -58,12 +58,13 @@ class MatchmakingNetwork {
   }
 
   connectToAddress(address: string | void) {
+    console.log('[Matchmaker][Debug] Matchmaker connecting to ' + address);
     if (this._socket) {
       return;
     }
 
     const socket: ?Socket = io(address);
-
+    console.log('[Matchmaker][Debug] Matchmaker connected, socket: ' + socket);
     // const socket: ?Socket = io(address, {query:"room=1"});
     if (socket) {
       this._socket = socket;
