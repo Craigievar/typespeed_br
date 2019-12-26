@@ -8,7 +8,7 @@ spec:
   hostNetwork: true
   restartPolicy: Never
   nodeSelector:
-    role: game-assets-server
+    role: apps
   containers:
     - name: game-assets-server
       image: gcr.io/tsbr-cluster-demo/game:v0

@@ -8,7 +8,7 @@ spec:
   hostNetwork: true
   restartPolicy: Never
   nodeSelector:
-    role: game-instance-manager-server
+    role: apps
   containers:
     - name: game-instance-manager-server
       image: gcr.io/tsbr-cluster-demo/game-instance-manager:v0
