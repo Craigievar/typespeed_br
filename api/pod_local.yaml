@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-api
+  labels:
+    pod-type: kube-api-pod
+spec:
+  hostNetwork: true
+  restartPolicy: Never
+  nodeSelector:
+    role: apps
+  containers:
+    - name: api
+      image: api
+      imagePullPolicy: Never
+      env:
+        - name: SESSION_NAME
+          value: "game-assets-server"
+        - name: REACT_APP_MATCHMAKER_SERVICE
+          value: "34.82.65.121:80"
