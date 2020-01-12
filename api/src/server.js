@@ -44,22 +44,37 @@ app.get('/', function(req, res) {
 `);
 });
 
-app.get('/getGameServer/', function(req, res) {
-  console.log("[API][Status] Getting and sending game server info");
-  // k8sApi.listNode().then((res2) => {
-  //   console.log(res2);
-  //   res.send(res2);
-  // })
-  // .catch((err) => {
-  //   console.log('[API][ERROR]: ' + JSON.stringify(err));
-  // });
-  k8sApi.listNamespacedPod('default')
-      .then((res2) => {
-        console.log(res2.body);
-      })
-      .catch((err) => {
-          console.log(err);
-      });
+app.get('/getNodes/', function(req, res) {
+  console.log("[API][Status] Getting and sending node info");
+  k8sApi.listNode().then((res2) => {
+    console.log('[API][Got nodes]');
+    res.send(res2);
+  })
+  .catch((err) => {
+    console.log('[API][ERROR]: ' + JSON.stringify(err));
+  });
+});
+
+app.get('/getPods/', function(req, res) {
+  console.log("[API][Status] Getting and sending pod info");
+  k8sApi.listPodForAllNamespaces().then((res2) => {
+    console.log('[API][Got pods]');
+    res.send(res2);
+  })
+  .catch((err) => {
+    console.log('[API][ERROR]: ' + JSON.stringify(err));
+  });
+});
+
+app.get('/getServices/', function(req, res) {
+  console.log("[API][Status] Getting and sending pod info");
+  k8sApi.listServiceForAllNamespaces().then((res2) => {
+    console.log('[API][Got services]');
+    res.send(res2);
+  })
+  .catch((err) => {
+    console.log('[API][ERROR]: ' + JSON.stringify(err));
+  });
 });
 
 app.listen(port, () => console.log('[API]] listening on port ' + process.env.PORT || 8084 + '!'));
