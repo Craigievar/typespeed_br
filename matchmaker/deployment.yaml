@@ -13,8 +13,8 @@ spec:
         role: apps
       containers:
       - name: matchmaker
-        image: gcr.io/${PROJECT}/matchmaker
-        imagePullPolicy: Always
+        image: gcr.io/tsbr-cluster-demo/matchmaker:v0
+        imagePullPolicy: Never
         readinessProbe:
             httpGet:
                 path: /ping

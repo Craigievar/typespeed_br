@@ -6,6 +6,6 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 8082
   selector:
     pod-type: game-instance-manager-pod

@@ -12,13 +12,7 @@ spec:
   containers:
     - name: matchmaker
       image: gcr.io/tsbr-cluster-demo/matchmaker:v0
-      imagePullPolicy: Always
+      imagePullPolicy: Never
       env:
-        - name: SESSION_NAME
-          value: "matchmaker"
-        - name: GAME_INSTANCE_MANAGER_SERVICE_HOST
-          value: "10.138.0.8"
-        - name: GAME_INSTANCE_MANAGER_SERVICE_PORT
-          value: "8082"
         - name: GAME_INSTANCE_MANAGER_SERVICE
-          value: "10.138.0.8:8082"
+          value: "http://game_instance_manager"

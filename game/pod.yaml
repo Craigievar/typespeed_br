@@ -12,9 +12,9 @@ spec:
   containers:
     - name: game-assets-server
       image: gcr.io/tsbr-cluster-demo/game:v0
-      imagePullPolicy: Always
+      imagePullPolicy: Never
       env:
         - name: SESSION_NAME
           value: "game-assets-server"
         - name: REACT_APP_MATCHMAKER_SERVICE
-          value: "34.82.65.121:80"
+          value: "http://matchmaker"

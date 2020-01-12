@@ -6,11 +6,11 @@ spec:
   hostNetwork: true
   restartPolicy: Never
   nodeSelector:
-    role: game-server
+    role: apps
   containers:
     - name: game-server
       image: gcr.io/tsbr-cluster-demo/game-server:v0
-      imagePullPolicy: Always
+      imagePullPolicy: Never
       env:
         - name: SESSION_NAME
-          value: "game-server"
+          value: "172.17.0.7"
