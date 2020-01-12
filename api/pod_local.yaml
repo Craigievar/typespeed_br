@@ -12,7 +12,7 @@ spec:
   containers:
     - name: api
       image: api
-      imagePullPolicy: Never
+      imagePullPolicy: Always
       env:
         - name: SESSION_NAME
           value: "game-assets-server"
