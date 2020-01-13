@@ -1,3 +1,5 @@
+// @flow
+
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -6,11 +8,71 @@ const request = require('request');
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+// const utils = require('./utils');
 
 // Port is passed in by heroku
 const port = process.env.PORT || 8084;
 
 //app.use(express.static(path.join(__dirname, 'build')));
+
+class Node {
+  // name: String;
+  // externalAddress: String;
+  // internalAddress: String;
+
+  constructor(nodeJSON) {
+    this.name = nodeJSON.metadata.name;
+    this.externalAddress = nodeJSON.status.addresses[1].address;
+    this.internalAddress = nodeJSON.status.addresses[0].address;
+  }
+
+  getName() {
+    return this.name;
+  }
+
+  print() {
+    return this.name + '\r\n' + this.externalAddress + '\r\n' + this.internalAddress;
+  }
+}
+
+function parseNodeInfo(response) {
+  console.log('[API][NodeInfo] in function');
+  //const parsed = JSON.parse(response);
+  const output = [];
+  try {
+    console.log('[API][NodeInfo] Parsing');
+    const items = response.response.body.items;
+    console.log('[API][NodeInfo] Looping');
+    items.forEach(function(item){
+      const tmp = new Node(item);
+      output.push(tmp);
+    });
+  }
+  catch(err) {
+    console.log('[API][NodeInfo][ParseError]:' + err.message);
+  }
+  return output;
+}
+
+function parsePodInfo(response) {
+  console.log('[API][PodInfo] in function');
+  //const parsed = JSON.parse(response);
+  const output = [];
+  try {
+    console.log('[API][PodInfo] Parsing');
+    const items = response.response.body.items;
+    console.log('[API][PodInfo] Looping');
+    items.forEach(function(item){
+      const tmp = new Node(item);
+      output.push(tmp);
+    });
+  }
+  catch(err) {
+    console.log('[API][NodeInfo][ParseError]:' + err.message);
+  }
+  return output;
+}
+
 
 app.get('/', function(req, res) {
   console.log("[API][Status] Sending index.html");
@@ -48,10 +110,17 @@ app.get('/getNodes/', function(req, res) {
   console.log("[API][Status] Getting and sending node info");
   k8sApi.listNode().then((res2) => {
     console.log('[API][Got nodes]');
-    res.send(res2);
+    // res.send(res2);
+    console.log('[API][Parsing Nodes]');
+    nodes = parseNodeInfo(res2);
+    let tmp = '';
+    nodes.forEach(function(item){
+        tmp += (item.print() + '\n');
+    });
+    res.send(tmp);
   })
   .catch((err) => {
-    console.log('[API][ERROR]: ' + JSON.stringify(err));
+    console.log('[API][ERROpR]: ' + err.message);
   });
 });
 
@@ -77,6 +146,63 @@ app.get('/getServices/', function(req, res) {
   });
 });
 
+app.get('/makePod/', function(req, res) {
+  console.log("[API][makePod] Making a Pod");
+  const thisPort = parseInt(req.query.port) || 8080;
+  console.log("[API][makePod] Pod will be at port " + thisPort);
+
+  var pod = {
+    apiVersion: 'v1',
+    kind: 'Pod',
+    metadata: {
+      name: 'game-server-' + thisPort.toString()
+    },
+    spec: {
+      hostNetwork: true,
+      restartPolicy: 'Never',
+      nodeSelector: {'role': 'game-server'},
+      containers: [
+        {
+          name: 'game-server',
+          image: 'gcr.io/tsbr-cluster-demo/game-server:v0',
+          imagePullPolicy: 'Always',
+          env:
+            [
+              {
+                name: 'SESSION_NAME',
+                value: 'game-server-' + thisPort.toString()
+              },
+              {
+                name: 'PORT',
+                value: thisPort.toString()
+              }
+            ],
+          ports:
+            [
+              {
+                containerPort: thisPort,
+                hostPort: thisPort,
+              }
+            ],
+        }
+      ]
+    },
+    status: {
+    }
+  };
+
+  k8sApi.createNamespacedPod(
+    'default',
+    pod,
+  ).then((res2) => {
+    console.log('[API][Pod Sent. Crossing Fingers!]');
+    res.send('Attempted to create pod on port ' + thisPort);
+  })
+  .catch((err) => {
+    console.log('[API][ERROR]: ' + JSON.stringify(err));
+  });
+});
+
 app.listen(port, () => console.log('[API]] listening on port ' + process.env.PORT || 8084 + '!'));
 
 
@@ -84,3 +210,5 @@ app.listen(port, () => console.log('[API]] listening on port ' + process.env.POR
 // <p>makeGameServer: makes a game server, and reports back on its info</p>
 // <p>getMMServer</p>
 // <p>getGIMServer</p>
+
+// createNamespacedPod
