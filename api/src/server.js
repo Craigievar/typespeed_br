@@ -216,7 +216,7 @@ app.get('/makePodAtPort/', function(req, res) {
   });
 });
 
-app.get('/makeAndFetchGameServer/', function(req, res) {
+app.post('/makeAndFetchGameServer/', function(req, res) {
   console.log("[API][makePod] Setting up a new game server");
   const thisPort = 7000 + Math.floor(Math.random() * 999);
   // TODO: check port isn't taken
@@ -248,7 +248,9 @@ app.get('/makeAndFetchGameServer/', function(req, res) {
       k8sApi.readNode(node)
       .then((readNodeRes) => {
         const thisIP = readNodeRes.response.body.status.addresses[1].address;
-        res.send(thisIP + ':' + thisPort);
+        res.json({
+          server_url: thisIP + ':' + thisPort,
+        });
         //res.send(readNodeRes.status.addresses[1]);
       })
       .catch((err) => {

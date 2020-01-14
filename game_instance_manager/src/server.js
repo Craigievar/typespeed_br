@@ -23,20 +23,18 @@ app.use(express.json());
 const port = process.env.PORT || 8082;
 
 app.post('/create_game', function(req, res) {
-  // request('10.0.0.1/makeAndFetchGameServer', function (error, response, body) {
-  request('10.0.0.1/', function (error, response, body) {
-    if (!error && response != 'err') {
-      console.log('[game_instance_manager]: Server on ' + response);
+  console.log('[game_instance_manager][requesting server]');
+  const serverUrl = superagent
+    .post(`10.51.240.2/makeAndFetchGameServer`)
+    .send({})
+    .then((createResponse) => {
       res.json({
-        server_url: response,
+        server_url: createResponse.body.server_url,
       });
-    }
-  })
-  // console.log('[game_instance_manager]: Server on ' +
-  //   `${process.env.GAME_SERVER_SERVICE_HOST}:${process.env.GAME_SERVER_SERVICE_PORT}`);
-  // res.json({
-  //   server_url: process.env.GAME_SERVER_SERVICE,
-  // });
+    })
+    .catch((err) => {
+      console.log('[game_instance_manager][Error]:' + JSON.stringify(err) + err.message);
+    });
 });
 
 app.get('/ping', function(req, res) {
