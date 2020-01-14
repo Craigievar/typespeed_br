@@ -2,12 +2,12 @@
 
 import type GameNetwork from './network/GameNetwork';
 import GameState from './network/GameState';
-const superagent = require('superagent');
 import React from 'react';
 import AnimatedText from './animations/AnimatedText';
 import './LobbyView.css';
 import MatchmakingNetwork from './network/MatchmakingNetwork';
 
+const superagent = require('superagent');
 const { useState, useEffect } = React;
 
 type Props = {

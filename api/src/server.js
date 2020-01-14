@@ -235,7 +235,7 @@ app.post('/makeAndFetchGameServer/', function(req, res) {
     console.log('[API][ERROR[makePod]]: ' + JSON.stringify(err) + err.message);
   })
   .then((name) => {
-    console.log('Trying to list pods with name ' + name);
+    console.log('[API]Trying to list pods with name ' + name);
     k8sApi.readNamespacedPod(name, 'default')
     .then((readPodRes) => {
       return(readPodRes.body.spec.nodeName);
@@ -244,10 +244,11 @@ app.post('/makeAndFetchGameServer/', function(req, res) {
       console.log('[API][ERROR][readPod]: ' + JSON.stringify(err) + err.message);
     })
     .then((node) => {
-      console.log('Trying to list nodes with name ' + node);
+      console.log('[API] Trying to list nodes with name ' + node);
       k8sApi.readNode(node)
       .then((readNodeRes) => {
         const thisIP = readNodeRes.response.body.status.addresses[1].address;
+        console.log('[API] Sending back address: ' + thisIP + ':' + thisPort);
         res.json({
           server_url: thisIP + ':' + thisPort,
         });

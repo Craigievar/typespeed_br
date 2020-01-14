@@ -28,6 +28,7 @@ app.post('/create_game', function(req, res) {
     .post(`10.51.240.2/makeAndFetchGameServer`)
     .send({})
     .then((createResponse) => {
+      console.log('[game_instance_manager] sending back address: ' + createResponse.body.server_url)
       res.json({
         server_url: createResponse.body.server_url,
       });
