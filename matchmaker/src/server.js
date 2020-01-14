@@ -17,7 +17,6 @@ app.use(cors());
 
 // Port is passed in by heroku
 const port = process.env.PORT || 8081;
-console.log(process.env);
 console.log("[Matchmaker] Connecting people to " + process.env.GAME_INSTANCE_MANAGER_SERVICE)
 
 const rooms = [];
@@ -26,6 +25,7 @@ let flushPlayerTimeoutID = null;
 let currentMatchID = uuid();
 
 io.on('connection', function(socket) {
+  console.log('[matchmaker][player connected]');
   const player = { ready: false, socket_id: socket.id, match_id: null };
   const joinedMatchID = currentMatchID;
   waitingPlayers.push(player);

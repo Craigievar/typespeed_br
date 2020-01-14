@@ -2,7 +2,7 @@
 
 import type GameNetwork from './network/GameNetwork';
 import GameState from './network/GameState';
-
+const superagent = require('superagent');
 import React from 'react';
 import AnimatedText from './animations/AnimatedText';
 import './LobbyView.css';
@@ -28,6 +28,7 @@ function LobbyView({ gameServer, gameState }: Props) {
 
   useEffect(() => {
     //const matchmakingUri = new URL(process.env.REACT_APP_MATCHMAKER_SERVICE);
+
     const matchmakingUri = new URL("http://34.82.145.79:80");
     matchmakingServer.connectToAddress(matchmakingUri.href);
     console.log(matchmakingUri);

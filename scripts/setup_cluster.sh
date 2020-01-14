@@ -14,6 +14,7 @@ kubectl label nodes gke-hello-cluster-pool-1-c35d7dd9-pnqc role=game-server --ov
 kubectl apply -f api/rbac.yaml
 
 #IP range is 10.51.240.0 - 10.51.255.255
+# Note services are in env like KUBE_API_SERVICE_SERVICE_HOST, we don't even have to specify them in yamls!!!
 kubectl apply -f api/pod.yaml
 kubectl apply -f api/service.yaml
 
