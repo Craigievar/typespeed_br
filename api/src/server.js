@@ -35,6 +35,50 @@ class Node {
   }
 }
 
+function makePod(thisPort) {
+  var pod = {
+    apiVersion: 'v1',
+    kind: 'Pod',
+    metadata: {
+      generateName: 'game-server-' + thisPort.toString() + '-'
+    },
+    spec: {
+      hostNetwork: true,
+      restartPolicy: 'Never',
+      nodeSelector: {'role': 'game-server'},
+      containers: [
+        {
+          name: 'game-server',
+          image: 'gcr.io/tsbr-cluster-demo/game-server:v0',
+          imagePullPolicy: 'Always',
+          env:
+            [
+              {
+                name: 'SESSION_NAME',
+                value: 'game-server-' + thisPort.toString()
+              },
+              {
+                name: 'PORT',
+                value: thisPort.toString()
+              }
+            ],
+          ports:
+            [
+              {
+                containerPort: thisPort,
+                hostPort: thisPort,
+              }
+            ],
+        }
+      ]
+    },
+    status: {
+    }
+  };
+
+  return(pod);
+}
+
 function parseNodeInfo(response) {
   console.log('[API][NodeInfo] in function');
   //const parsed = JSON.parse(response);
@@ -146,62 +190,79 @@ app.get('/getServices/', function(req, res) {
   });
 });
 
-app.get('/makePod/', function(req, res) {
+app.get('/makePodAtPort/', function(req, res) {
   console.log("[API][makePod] Making a Pod");
   const thisPort = parseInt(req.query.port) || 8080;
   console.log("[API][makePod] Pod will be at port " + thisPort);
 
-  var pod = {
-    apiVersion: 'v1',
-    kind: 'Pod',
-    metadata: {
-      name: 'game-server-' + thisPort.toString()
-    },
-    spec: {
-      hostNetwork: true,
-      restartPolicy: 'Never',
-      nodeSelector: {'role': 'game-server'},
-      containers: [
-        {
-          name: 'game-server',
-          image: 'gcr.io/tsbr-cluster-demo/game-server:v0',
-          imagePullPolicy: 'Always',
-          env:
-            [
-              {
-                name: 'SESSION_NAME',
-                value: 'game-server-' + thisPort.toString()
-              },
-              {
-                name: 'PORT',
-                value: thisPort.toString()
-              }
-            ],
-          ports:
-            [
-              {
-                containerPort: thisPort,
-                hostPort: thisPort,
-              }
-            ],
-        }
-      ]
-    },
-    status: {
-    }
-  };
+  var pod = makePod(thisPort);
 
   k8sApi.createNamespacedPod(
     'default',
     pod,
   ).then((res2) => {
     console.log('[API][Pod Sent. Crossing Fingers!]');
-    res.send('Attempted to create pod on port ' + thisPort);
+    //res.send('Attempted to create pod on port ' + thisPort);
+    try{
+      res.send(res2.response.body.metadata.name);
+    }
+    catch{
+      res.send('err');
+    }
+
   })
   .catch((err) => {
     console.log('[API][ERROR]: ' + JSON.stringify(err));
   });
 });
+
+app.get('/makeAndFetchGameServer/', function(req, res) {
+  console.log("[API][makePod] Setting up a new game server");
+  const thisPort = 7000 + Math.floor(Math.random() * 999);
+  // TODO: check port isn't taken
+  console.log("[API][makePod] Pod will be at port " + thisPort);
+
+  var pod = makePod(thisPort);
+
+  k8sApi.createNamespacedPod(
+    'default',
+    pod,
+  ).then((createRes) => {
+    console.log('[API][Pod Sent. Crossing Fingers!]');
+    return(createRes.response.body.metadata.name);
+  })
+  .catch((err) => {
+    console.log('[API][ERROR[makePod]]: ' + JSON.stringify(err) + err.message);
+  })
+  .then((name) => {
+    console.log('Trying to list pods with name ' + name);
+    k8sApi.readNamespacedPod(name, 'default')
+    .then((readPodRes) => {
+      return(readPodRes.body.spec.nodeName);
+    })
+    .catch((err) => {
+      console.log('[API][ERROR][readPod]: ' + JSON.stringify(err) + err.message);
+    })
+    .then((node) => {
+      console.log('Trying to list nodes with name ' + node);
+      k8sApi.readNode(node)
+      .then((readNodeRes) => {
+        const thisIP = readNodeRes.response.body.status.addresses[1].address;
+        res.send(thisIP + ':' + thisPort);
+        //res.send(readNodeRes.status.addresses[1]);
+      })
+      .catch((err) => {
+        console.log('[API][ERROR][readNode]: ' + JSON.stringify(err) + err.message);
+      });
+    });
+  })
+  .catch((err) => {
+    console.log('[API][ERROR]: ' + JSON.stringify(err));
+  });
+});
+
+
+
 
 app.listen(port, () => console.log('[API]] listening on port ' + process.env.PORT || 8084 + '!'));
 
