@@ -8,4 +8,4 @@ spec:
     targetPort: 8081
   selector:
     pod-type: matchmaker-pod
-  clusterIP: 10.51.240.3
+  clusterIP: 10.51.240.4
