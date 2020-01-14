@@ -8,5 +8,6 @@ gcloud compute firewall-rules create my-rule --allow=tcp:7000-8000
 # should clean this up later!!!
 kubectl apply -f api/rbac.yaml
 
+#IP range is 10.51.240.0 - 10.51.255.255
 kubectl apply -f api/pod.yaml
 kubectl apply -f api/service.yaml

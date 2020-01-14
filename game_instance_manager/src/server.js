@@ -23,7 +23,8 @@ app.use(express.json());
 const port = process.env.PORT || 8082;
 
 app.post('/create_game', function(req, res) {
-  request('10.0.0.1/makeAndFetchGameServer', function (error, response, body) {
+  // request('10.0.0.1/makeAndFetchGameServer', function (error, response, body) {
+  request('10.0.0.1/', function (error, response, body) {
     if (!error && response != 'err') {
       console.log('[game_instance_manager]: Server on ' + response);
       res.json({
