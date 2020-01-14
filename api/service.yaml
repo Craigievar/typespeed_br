@@ -8,4 +8,4 @@ spec:
     targetPort: 8084
   selector:
     pod-type: kube-api-pod
-  clusterIP: 10.51.240.1
+  clusterIP: 10.51.240.2
