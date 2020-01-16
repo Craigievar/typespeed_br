@@ -13,27 +13,46 @@ const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 // Port is passed in by heroku
 const port = process.env.PORT || 8084;
 
-//app.use(express.static(path.join(__dirname, 'build')));
+const maxRetries = 5;
+const retryBackOffRate = 2;
 
-class Node {
-  // name: String;
-  // externalAddress: String;
-  // internalAddress: String;
-
-  constructor(nodeJSON) {
-    this.name = nodeJSON.metadata.name;
-    this.externalAddress = nodeJSON.status.addresses[1].address;
-    this.internalAddress = nodeJSON.status.addresses[0].address;
-  }
-
-  getName() {
-    return this.name;
-  }
-
-  print() {
-    return this.name + '\r\n' + this.externalAddress + '\r\n' + this.internalAddress;
-  }
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
 }
+
+async function getNodeName(name){
+  const podData = await k8sApi.readNamespacedPod(name, 'default');
+  console.log('[API][Node Name] ' + podData.body.spec.nodeName);
+  return podData.body.spec.nodeName;
+}
+
+function incr(n){
+  return (n + 1);
+}
+
+async function getNodeInfo(name){
+  let currentRetry = 0;
+
+  var currentRetryFn = function(){
+    console.log('[API][Retry Count][Increment]');
+    currentRetry++;
+  };
+
+  console.log('[API][Retry Count] ' + currentRetry);
+  let node = null;
+  do {
+    node = await getNodeName(name);
+    console.log('[API][Node Name]' + node);
+    sleep(1000).then(
+      currentRetryFn
+    );
+    console.log('[API][Retry Count] ' + currentRetry);
+  }
+  while(!node && currentRetry < maxRetries);
+
+  return node;
+}
+
 
 function makePod(thisPort) {
   var pod = {
@@ -78,45 +97,6 @@ function makePod(thisPort) {
 
   return(pod);
 }
-
-function parseNodeInfo(response) {
-  console.log('[API][NodeInfo] in function');
-  //const parsed = JSON.parse(response);
-  const output = [];
-  try {
-    console.log('[API][NodeInfo] Parsing');
-    const items = response.response.body.items;
-    console.log('[API][NodeInfo] Looping');
-    items.forEach(function(item){
-      const tmp = new Node(item);
-      output.push(tmp);
-    });
-  }
-  catch(err) {
-    console.log('[API][NodeInfo][ParseError]:' + err.message);
-  }
-  return output;
-}
-
-function parsePodInfo(response) {
-  console.log('[API][PodInfo] in function');
-  //const parsed = JSON.parse(response);
-  const output = [];
-  try {
-    console.log('[API][PodInfo] Parsing');
-    const items = response.response.body.items;
-    console.log('[API][PodInfo] Looping');
-    items.forEach(function(item){
-      const tmp = new Node(item);
-      output.push(tmp);
-    });
-  }
-  catch(err) {
-    console.log('[API][NodeInfo][ParseError]:' + err.message);
-  }
-  return output;
-}
-
 
 app.get('/', function(req, res) {
   console.log("[API][Status] Sending index.html");
@@ -228,7 +208,7 @@ app.post('/makeAndFetchGameServer/', function(req, res) {
     'default',
     pod,
   ).then((createRes) => {
-    console.log('[API][Pod Sent. Crossing Fingers!]');
+    console.log('[API][Pod Requested]');
     return(createRes.response.body.metadata.name);
   })
   .catch((err) => {
@@ -236,19 +216,14 @@ app.post('/makeAndFetchGameServer/', function(req, res) {
   })
   .then((name) => {
     console.log('[API]Trying to list pods with name ' + name);
-    k8sApi.readNamespacedPod(name, 'default')
-    .then((readPodRes) => {
-      return(readPodRes.body.spec.nodeName);
-    })
-    .catch((err) => {
-      console.log('[API][ERROR][readPod]: ' + JSON.stringify(err) + err.message);
-    })
+
+    getNodeInfo(name)
     .then((node) => {
-      console.log('[API] Trying to list nodes with name ' + node);
+      console.log('[API][Listing Nodes] ' + node);
       k8sApi.readNode(node)
       .then((readNodeRes) => {
         const thisIP = readNodeRes.response.body.status.addresses[1].address;
-        console.log('[API] Sending back address: ' + thisIP + ':' + thisPort);
+        console.log('[API][Send Address] ' + thisIP + ':' + thisPort);
         res.json({
           server_url: thisIP + ':' + thisPort,
         });
@@ -257,10 +232,13 @@ app.post('/makeAndFetchGameServer/', function(req, res) {
       .catch((err) => {
         console.log('[API][ERROR][readNode]: ' + JSON.stringify(err) + err.message);
       });
+    })
+    .catch((err) => {
+      console.log('[API][ERROR]: ' + JSON.stringify(err) + err.message);
     });
   })
   .catch((err) => {
-    console.log('[API][ERROR]: ' + JSON.stringify(err));
+    console.log('[API][ERROR]: ' + JSON.stringify(err) + err.message);
   });
 });
 
