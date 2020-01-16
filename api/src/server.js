@@ -215,7 +215,7 @@ app.post('/makeAndFetchGameServer/', function(req, res) {
     console.log('[API][ERROR[makePod]]: ' + JSON.stringify(err) + err.message);
   })
   .then((name) => {
-    console.log('[API]Trying to list pods with name ' + name);
+    console.log('[API][Listing Pods] ' + name);
 
     getNodeInfo(name)
     .then((node) => {
