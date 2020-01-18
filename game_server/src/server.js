@@ -235,21 +235,24 @@ function generateWords(game) {
 }
 
 function resetGame(game) {
-  game.state = 'LOBBY';
-  game.playersLeft = 0;
-  game.loadTime = COUNTDOWN_LENGTH;
-  game.time = 0;
-  game.inCountdown = false;
-  game.delay = MS_PER_WORD_BASE;
-  game.playersNeeded = MIN_PLAYERS_TO_START;
 
-  for (const { name, id, room } of Object.values(game.players)) {
-    game.players[id] = newPlayer(id);
-    game.players[id].room = room;
-    if(name) {
-      game.players[id].name = name;
-    }
-  }
+  process.exit();
+  //
+  // game.state = 'LOBBY';
+  // game.playersLeft = 0;
+  // game.loadTime = COUNTDOWN_LENGTH;
+  // game.time = 0;
+  // game.inCountdown = false;
+  // game.delay = MS_PER_WORD_BASE;
+  // game.playersNeeded = MIN_PLAYERS_TO_START;
+  //
+  // for (const { name, id, room } of Object.values(game.players)) {
+  //   game.players[id] = newPlayer(id);
+  //   game.players[id].room = room;
+  //   if(name) {
+  //     game.players[id].name = name;
+  //   }
+  // }
 }
 
 function updateGameState(game) {
@@ -401,4 +404,4 @@ setInterval(function() {
       }
     }
   }
-}, 1000 / 60);
+}, 1000 / 20);
