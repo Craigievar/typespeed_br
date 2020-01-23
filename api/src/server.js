@@ -134,28 +134,32 @@ app.get('/getNodes/', function(req, res) {
   console.log("[API][Status] Getting and sending node info");
   k8sApi.listNode().then((res2) => {
     console.log('[API][Got nodes]');
-    // res.send(res2);
-    console.log('[API][Parsing Nodes]');
-    nodes = parseNodeInfo(res2);
-    let tmp = '';
-    nodes.forEach(function(item){
-        tmp += (item.print() + '\n');
+    nodes = res2.response.body.items;
+    let tmpstr = '';
+    nodes.forEach((node) => {
+      tmpstr = tmpstr + node.metadata.name + ' has role ' + node.metadata.labels.role + '     ';
     });
-    res.send(tmp);
+    res.send(tmpstr);
   })
   .catch((err) => {
-    console.log('[API][ERROpR]: ' + err.message);
+    console.log('[API][ERROR]: ' + err.message);
   });
 });
 
 app.get('/getPods/', function(req, res) {
   console.log("[API][Status] Getting and sending pod info");
   k8sApi.listPodForAllNamespaces().then((res2) => {
-    console.log('[API][Got pods]');
-    res.send(res2);
+    pods = res2.response.body.items;
+    let tmpstr = '';
+    pods.forEach((pod) => {
+      if(pod.spec.nodeSelector){
+        tmpstr = tmpstr + pod.metadata.name + ' has role ' + pod.spec.nodeSelector.role + '     ';
+      }
+    });
+    res.send(tmpstr);
   })
   .catch((err) => {
-    console.log('[API][ERROR]: ' + JSON.stringify(err));
+    console.log('[API][ERROR]: ' + JSON.stringify(err) + err.message);
   });
 });
 
