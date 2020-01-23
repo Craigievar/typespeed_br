@@ -12,12 +12,12 @@ const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 const port = process.env.PORT || 8085;
 
 function calculateGap(nodes, pods, buffer){
-  let available = nodes.length * process.env.SERVERS_PER_NODE;
-  let needed = pods.length + process.env.BUFFER_SIZE;
+  let available = nodes.length * parseInt(process.env.SERVERS_PER_NODE);
+  let needed = pods.length + parseInt(process.env.BUFFER_SIZE);
   return(available - needed);
 }
 
-async function getGameServerNodes(){
+function getGameServerNodes(){
   k8sApi.listNode().then((res) => {
     console.log('[AutoScaler][Got nodes]' + res);
 
@@ -107,8 +107,8 @@ function makeNodeTemplate(thisPort) {
 
 function scaleNodes(){
   console.log('[Autoscaler][Get Nodes and Pods]');
-  let nodes = await getGameServerNodes();
-  let pods = await getGameServerPods();
+  let nodes = getGameServerNodes();
+  let pods = getGameServerPods();
 
   console.log('[Autoscaler][Iteration]');
   //array of cordoned node names
@@ -151,7 +151,7 @@ function scaleNodes(){
 
     // serverGap = serverGap - uncordonedSpace;
 
-    if (serverGap > 0 || pods.length < process.env.MIN_SERVERS) {
+    if (serverGap > 0 || pods.length < parseInt(process.env.MIN_SERVERS)) {
       // no cordoned nodes to uncordon, or it didn't free up enough space
       // make X nodes
       nodeTemplate = makeNodeTemplate();
@@ -182,4 +182,4 @@ function scaleNodes(){
 
 setInterval(function() {
   scaleNodes();
-}, process.env.REFRESH_SECONDS/1000.0);
+}, parseInt(process.env.REFRESH_SECONDS)/1000.0);
