@@ -19,9 +19,14 @@ const RESET_LENGTH = config.RESET_LENGTH;
 const PLAYERS_TO_WIN = config.PLAYERS_TO_WIN;
 
 // Dependencies
+const AgonesSDK = require('@google-cloud/agones-sdk');
+let agonesSDK = new AgonesSDK();
+
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
+
+
 
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
@@ -39,7 +44,7 @@ app.set('port', port);
 
 // Start the server.
 server.listen(port, function() {
-  console.log('[game_server]', 'Starting server on port' + (port));
+  console.log('[game_server]', 'Starting server on port ' + (port));
 });
 
 // Map of socket channels to games
@@ -376,6 +381,43 @@ io.on('connection', function(socket) {
     }
   });
 });
+
+
+
+// let connect = async function() {
+// 	// agonesSDK.watchGameServer((result) => {
+// 	// 	console.log('watch', result);
+// 	// });
+//
+// 	try {
+// 		await agonesSDK.ready();
+// 		await agonesSDK.setLabel("label", "labelValue");
+// 		await agonesSDK.setAnnotation("annotation", "annotationValue");
+// 		let result = await agonesSDK.getGameServer();
+// 		console.log('gameServer', result);
+// 		setTimeout(() => {
+// 			console.log('send health ping');
+// 			agonesSDK.health();
+// 		}, 2000);
+// 		setTimeout(() => {
+// 			console.log('send shutdown request');
+// 			agonesSDK.shutdown();
+// 		}, 4000);
+// 		setTimeout(() => {
+// 			process.exit();
+// 		}, 6000);
+// 	} catch (error) {
+// 		console.error(error);
+// 	}
+// };
+
+await agonesSDK.connect();
+		setTimeout(() => {
+			console.log('send health ping');
+			agonesSDK.health();
+		}, 2000);
+
+let result = await agonesSDK.ready();
 
 // Emit gamestate to players
 setInterval(function() {
