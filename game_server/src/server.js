@@ -413,37 +413,42 @@ io.on('connection', function(socket) {
 
 const setupAgones = async () => {
   await agonesSDK.connect();
-      setTimeout(() => {
-        console.log('send health ping');
-        agonesSDK.health();
-      }, 2000);
 
-      console.log('Marking as ready')
-      let result = await agonesSDK.ready();
+  setTimeout(() => {
+    console.log('send health ping');
+    agonesSDK.health();
+  }, 2000);
 
-      setTimeout(() => {
-        console.log('Shutting down after 300 seconds...');
-        agonesSDK.shutdown();
-        console.log('...marked for Shutdown');
-      }, 300000);
+  console.log('Marking as ready')
+  let result = await agonesSDK.ready();
 
-      setTimeout(() => {
-          agonesSDK.close();
-      }, 390000);
+  console.log('Timeout for shutdown')
+  setTimeout(() => {
+    console.log('Shutting down after 300 seconds...');
+    agonesSDK.shutdown();
+    console.log('...marked for Shutdown');
+  }, 300000);
 
-        setTimeout(() => {
-        process.exit(0);
-      }, 3100000);
+  console.log('Timeout for close')
+  setTimeout(() => {
+      agonesSDK.close();
+  }, 390000);
+
+  console.log('Timeout for exit')
+  setTimeout(() => {
+    process.exit(0);
+  }, 3100000);
 }
 
 
 
 
-console.log('setting up agones')
+console.log('Setting up agones')
 setupAgones();
 // Emit gamestate to players
 console.log('Starting main loop');
 setInterval(function() {
+  console.log('looping');
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
       if(numPlayers(gamesOnServer[game]) > 0){
@@ -452,4 +457,4 @@ setInterval(function() {
       }
     }
   }
-}, 1000 / 20);
+}, 1000 / 1);
