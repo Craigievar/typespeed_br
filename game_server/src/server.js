@@ -411,15 +411,38 @@ io.on('connection', function(socket) {
 // 	}
 // };
 
-await agonesSDK.connect();
-		setTimeout(() => {
-			console.log('send health ping');
-			agonesSDK.health();
-		}, 2000);
+const setupAgones = async () => {
+  await agonesSDK.connect();
+      setTimeout(() => {
+        console.log('send health ping');
+        agonesSDK.health();
+      }, 2000);
 
-let result = await agonesSDK.ready();
+      console.log('Marking as ready')
+      let result = await agonesSDK.ready();
 
+      setTimeout(() => {
+        console.log('Shutting down after 300 seconds...');
+        agonesSDK.shutdown();
+        console.log('...marked for Shutdown');
+      }, 300000);
+
+      setTimeout(() => {
+          agonesSDK.close();
+      }, 390000);
+
+        setTimeout(() => {
+        process.exit(0);
+      }, 3100000);
+}
+
+
+
+
+console.log('setting up agones')
+setupAgones();
 // Emit gamestate to players
+console.log('Starting main loop');
 setInterval(function() {
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
