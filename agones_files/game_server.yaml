@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: "stable.agones.dev/v1alpha1"
+apiVersion: "stable.agones.dev/v1"
 kind: GameServer
 metadata:
-  name: "agones-game-server"
+  generateName: "agones-game-server-"
 spec:
   ports:
     - name: default
