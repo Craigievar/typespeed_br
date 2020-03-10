@@ -25,5 +25,5 @@ spec:
     spec:
       containers:
       - name: server
-        image: gcr.io/agones-images/xonotic-example:0.5
+        image: gcr.io/typespeed-br/game-server:v0
         # imagePullPolicy: Always # add for development
