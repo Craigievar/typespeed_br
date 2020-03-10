@@ -5,8 +5,8 @@ gcloud config set project tsbr-cluster-demo
 gcloud compute firewall-rules create my-rule --allow=tcp:7000-8000
 
 kubectl label nodes gke-hello-cluster-default-pool-184e5807-6xt7 role=apps --overwrite=True
-kubectl label nodes gke-hello-cluster-default-pool-184e5807-937p role=apps --overwrite=True
-kubectl label nodes gke-hello-cluster-pool-1-c35d7dd9-0zcz role=apps --overwrite=True
+kubectl label nodes gke-hello-cluster-default-pool-184e5807-937p role=game-server --overwrite=True
+kubectl label nodes gke-hello-cluster-pool-1-c35d7dd9-0zcz role=game-server --overwrite=True
 kubectl label nodes gke-hello-cluster-pool-1-c35d7dd9-pnqc role=game-server --overwrite=True
 
 kubectl apply -f api/rbac.yaml
