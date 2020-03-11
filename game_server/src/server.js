@@ -414,30 +414,30 @@ io.on('connection', function(socket) {
 const setupAgones = async () => {
   await agonesSDK.connect();
 
-  setTimeout(() => {
-    console.log('send health ping');
+  setInterval(() => {
+    console.log('send health ping: ' + Date.now().toString());
     agonesSDK.health();
   }, 2000);
 
   console.log('Marking as ready')
   let result = await agonesSDK.ready();
 
-  console.log('Timeout for shutdown')
-  setTimeout(() => {
-    console.log('Shutting down after 300 seconds...');
-    agonesSDK.shutdown();
-    console.log('...marked for Shutdown');
-  }, 300000);
-
-  console.log('Timeout for close')
-  setTimeout(() => {
-      agonesSDK.close();
-  }, 390000);
-
-  console.log('Timeout for exit')
-  setTimeout(() => {
-    process.exit(0);
-  }, 3100000);
+  // console.log('Timeout for shutdown')
+  // setTimeout(() => {
+  //   console.log('Shutting down after 300 seconds...');
+  //   agonesSDK.shutdown();
+  //   console.log('...marked for Shutdown');
+  // }, 300000);
+  //
+  // console.log('Timeout for close')
+  // setTimeout(() => {
+  //     agonesSDK.close();
+  // }, 390000);
+  //
+  // console.log('Timeout for exit')
+  // setTimeout(() => {
+  //   process.exit(0);
+  // }, 3100000);
 }
 
 

@@ -1,0 +1,47 @@
+{
+  "name": "craig_game3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "build": "babel src/ -d build/",
+    "start-local": "NODE_ENV=development GAME_SERVER_SERVICE_HOST=http://localhost GAME_SERVER_SERVICE_PORT=8083 babel-watch src/server.js",
+    "start": "NODE_ENV=production node build/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": ".",
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "express": "^4.16.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1",
+    "socket.io": "^2.2.0",
+    "tiny-uuid": "^1.0.0",
+    "@google-cloud/agones-sdk": "^1.4.0"
+  },
+  "engines": {
+    "node": "11.11.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.5",
+    "@babel/node": "^7.7.4",
+    "@babel/preset-flow": "^7.7.4",
+    "babel-watch": "^7.0.0",
+    "flow-bin": "^0.103.0",
+    "prettier": "^1.18.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -11,3 +11,14 @@ docker push gcr.io/tsbr-cluster-demo/game-server:v0
 docker push gcr.io/tsbr-cluster-demo/matchmaker:v0
 docker push gcr.io/tsbr-cluster-demo/api:v0
 docker push gcr.io/tsbr-cluster-demo/autoscaler:v0
+
+
+
+
+
+docker build game_server -t gcr.io/typespeed-br/game-server:v0
+docker push gcr.io/typespeed-br/game-server:v0
+
+
+docker build game_server_dummy -t gcr.io/typespeed-br/game-server_dummy:v0
+docker push gcr.io/typespeed-br/game-server_dummy:v0
