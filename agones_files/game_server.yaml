@@ -19,9 +19,10 @@ metadata:
 spec:
   ports:
     - name: default
-      portPolicy: Static
+      portPolicy: Dynamic
+      #portPolicy: Static
       containerPort: 7030
-      hostPort: 7030
+      #hostPort: 7030
       protocol: TCP
   template:
     spec:
