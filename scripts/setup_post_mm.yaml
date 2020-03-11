@@ -20,8 +20,6 @@ metadata:
 spec:
   hostNetwork: true
   restartPolicy: Never
-  nodeSelector:
-    role: apps
   containers:
     - name: matchmaker
       image: gcr.io/tsbr-cluster-demo/matchmaker:v0
@@ -45,8 +43,6 @@ metadata:
 spec:
   hostNetwork: true
   restartPolicy: Never
-  nodeSelector:
-    role: apps
   containers:
     - name: game-instance-manager-server
       image: gcr.io/tsbr-cluster-demo/game-instance-manager:v0
@@ -89,8 +85,6 @@ metadata:
 spec:
   hostNetwork: true
   restartPolicy: Never
-  nodeSelector:
-    role: apps
   containers:
     - name: api
       image: gcr.io/tsbr-cluster-demo/api:v0
@@ -110,8 +104,6 @@ metadata:
 spec:
   hostNetwork: true
   restartPolicy: Never
-  nodeSelector:
-    role: apps
   containers:
     - name: game-assets-server
       image: gcr.io/tsbr-cluster-demo/game:v0
