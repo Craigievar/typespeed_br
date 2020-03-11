@@ -20,5 +20,5 @@ docker build game_server -t gcr.io/typespeed-br/game-server:v0
 docker push gcr.io/typespeed-br/game-server:v0
 
 
-docker build game_server_dummy -t gcr.io/typespeed-br/game-server_dummy:v0
-docker push gcr.io/typespeed-br/game-server_dummy:v0
+docker build game_server_dummy -t gcr.io/typespeed-br/game-server-dummy:v0
+docker push gcr.io/typespeed-br/game-server-dummy:v0
