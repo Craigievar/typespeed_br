@@ -22,7 +22,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: matchmaker
-      image: gcr.io/tsbr-cluster-demo/matchmaker:v0
+      image: gcr.io/typespeed-br/matchmaker:v0
       imagePullPolicy: Always
       env:
         - name: SESSION_NAME
@@ -45,7 +45,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: game-instance-manager-server
-      image: gcr.io/tsbr-cluster-demo/game-instance-manager:v0
+      image: gcr.io/typespeed-br/game-instance-manager:v0
       imagePullPolicy: Always
       env:
         - name: SESSION_NAME
@@ -74,7 +74,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: game-assets-server
-      image: gcr.io/tsbr-cluster-demo/game:v0
+      image: gcr.io/typespeed-br/game:v0
       imagePullPolicy: Always
       env:
         - name: SESSION_NAME
