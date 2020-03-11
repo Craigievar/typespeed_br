@@ -63,38 +63,6 @@ spec:
     pod-type: game-instance-manager-pod
   clusterIP: 10.51.240.3
 ---
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kube-api-service
-spec:
-  ports:
-  - port: 80
-    targetPort: 8084
-  selector:
-    pod-type: kube-api-pod
-  clusterIP: 10.51.240.2
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: kube-api
-  labels:
-    pod-type: kube-api-pod
-spec:
-  hostNetwork: true
-  restartPolicy: Never
-  containers:
-    - name: api
-      image: gcr.io/tsbr-cluster-demo/api:v0
-      imagePullPolicy: Always
-      env:
-        - name: SESSION_NAME
-          value: "game-assets-server"
-        - name: REACT_APP_MATCHMAKER_SERVICE
-          value: "34.82.65.121:80"
----
 apiVersion: v1
 kind: Pod
 metadata:

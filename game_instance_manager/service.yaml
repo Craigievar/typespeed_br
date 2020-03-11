@@ -8,4 +8,4 @@ spec:
     targetPort: 8082
   selector:
     pod-type: game-instance-manager-pod
-  clusterIP: 10.51.240.3
+  clusterIP: 10.0.15.240

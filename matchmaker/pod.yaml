@@ -17,8 +17,8 @@ spec:
         - name: SESSION_NAME
           value: "matchmaker"
         - name: GAME_INSTANCE_MANAGER_SERVICE_HOST
-          value: "10.51.240.3"
+          value: "10.0.15.240"
         - name: GAME_INSTANCE_MANAGER_SERVICE_PORT
           value: "80"
         - name: GAME_INSTANCE_MANAGER_SERVICE
-          value: "10.51.240.3:80"
+          value: "10.0.15.240:80"
