@@ -15,14 +15,14 @@
 apiVersion: "agones.dev/v1"
 kind: GameServer
 metadata:
-  name: "game-server2"
+  name: "game-server3"
   generateName: "agones-game-server-"
 spec:
   ports:
     - name: default
-      portPolicy: Static
+      portPolicy: Dynamic
       containerPort: 7030
-      hostPort: 7030
+      # hostPort: 7030
       protocol: TCP
   template:
     spec:
