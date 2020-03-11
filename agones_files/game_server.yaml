@@ -27,6 +27,6 @@ spec:
     spec:
       containers:
       - name: server
-        image: gcr.io/typespeed-br/game-server-dummy:v0
+        image: gcr.io/typespeed-br/game-server:v0
         imagePullPolicy: Always
         # imagePullPolicy: Always # add for development

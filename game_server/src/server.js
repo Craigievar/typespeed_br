@@ -30,7 +30,7 @@ const socketIO = require('socket.io');
 
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
-const io = socketIO(server);
+const io = socketIO(server, {origins: "35.230.110.198:80"});
 
 const path = require('path');
 
