@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: kube-api
-  labels:
-    pod-type: kube-api-pod
+  # labels:
+  #   pod-type: kube-api-pod
 spec:
   hostNetwork: true
   restartPolicy: Never

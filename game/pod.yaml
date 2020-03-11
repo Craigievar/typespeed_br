@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: game-assets
-  labels:
-    pod-type: game-assets-pod
+  # labels:
+  #   pod-type: game-assets-pod
 spec:
   hostNetwork: true
   restartPolicy: Never

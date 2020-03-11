@@ -40,7 +40,7 @@ class GameNetwork {
     if (this._socket) {
       return;
     }
-
+    
     let room = null;
     window.location.search
       .substr(1)

@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: autoscaler
-  labels:
-    pod-type: autoscaler-pod
+  # labels:
+  #   pod-type: autoscaler-pod
 spec:
   restartPolicy: Never
   nodeSelector:

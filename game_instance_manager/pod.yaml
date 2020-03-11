@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: instance-manager
-  labels:
-    pod-type: game-instance-manager-pod
+  # labels:
+  #   pod-type: game-instance-manager-pod
 spec:
   hostNetwork: true
   restartPolicy: Never
