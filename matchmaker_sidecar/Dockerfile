@@ -1,5 +1,6 @@
-FROM ubuntu
-
-ADD ./proxy.sh /usr/src/proxy.sh
-RUN chmod +x /usr/src/proxy.sh
-CMD ["/usr/src/proxy.sh"]
+FROM alpine:3.10.1
+#v1.15.2 is the version that is running your cluster
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.14.10/bin/linux/amd64/kubectl /usr/local/bin/kubectl
+RUN chmod +x /usr/local/bin/kubectl
+EXPOSE 8001
+ENTRYPOINT ["/usr/local/bin/kubectl", "proxy"]
