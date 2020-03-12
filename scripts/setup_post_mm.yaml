@@ -33,6 +33,9 @@ spec:
           value: "80"
         - name: GAME_INSTANCE_MANAGER_SERVICE
           value: "10.15.240.2:80"
+    - name: matchmaker-sidecar
+      image: gcr.io/typespeed-br/matchmaker-sidecar:v0
+      imagePullPolicy: Always
 ---
 apiVersion: v1
 kind: Pod
