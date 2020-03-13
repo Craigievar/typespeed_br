@@ -13,6 +13,7 @@ const io = socketIO(server);
 
 const MIN_PLAYERS_DYNAMIC_START = 50;
 let minPlayers = MIN_PLAYERS_DYNAMIC_START;
+console.log('Min Players: ' + minPlayers);
 
 app.use(express.json());
 app.use(cors());
@@ -60,7 +61,8 @@ io.on('connection', function(socket) {
     const readyPlayers = waitingPlayers.filter(p => p.ready);
     if (readyPlayers.length >= minPlayers) {
       io.in(player.match_id).emit('requesting_game');
-
+      console.log('Num players ready: ' + readyPlayers.length);
+      console.log('Min Players: ' + minPlayers);
       flushPlayerTimeoutID =
         flushPlayerTimeoutID ||
         setTimeout(async () => {
@@ -97,11 +99,6 @@ app.get('/ping', function(req, res) {
   });
 });
 
-// app.listen(port);
-server.listen(port, function() {
-  console.log('Starting server on port' + (port));
-});
-
 // every 5 seconds, lower number of players needed
 setInterval(function() {
   //console.log('looping');
@@ -113,3 +110,8 @@ setInterval(function() {
     });
   }
 }, 5000);
+
+// app.listen(port);
+server.listen(port, function() {
+  console.log('Starting server on port' + (port));
+});
