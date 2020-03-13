@@ -17,7 +17,7 @@ app.use(cors());
 
 // Port is passed in by heroku
 const port = process.env.PORT || 8081;
-console.log("[Matchmaker] Connecting people to " + '${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}')
+console.log("[Matchmaker] Connecting people to " + `${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}`)
 
 const rooms = [];
 let waitingPlayers = [];
@@ -67,7 +67,8 @@ io.on('connection', function(socket) {
           currentMatchID = uuid();
           waitingPlayers = waitingPlayers.filter(p => !p.ready);
           flushPlayerTimeoutID = null;
-
+          console.log(process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST);
+          console.log(process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT);
           console.log('[matchmaker] Requesting game creation from ', `http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`);
           const serverUrl = await superagent
             .post(`http://${process.env.GAME_INSTANCE_MANAGER_SERVICE_HOST}:${process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT}/create_game`)
