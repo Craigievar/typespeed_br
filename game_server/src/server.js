@@ -31,7 +31,7 @@ const socketIO = require('socket.io');
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
 //allow game-assets
-const io = socketIO(server, {origins: "34.82.175.234:80"});
+const io = socketIO(server, {origins: "34.83.70.97:80"});
 
 const path = require('path');
 
@@ -242,6 +242,22 @@ function generateWords(game) {
 
 function resetGame(game) {
   // process.exit();
+  console.log('Timeout for shutdown')
+  setTimeout(() => {
+    console.log('Shutting down after 10 seconds...');
+    agonesSDK.shutdown();
+    console.log('...marked for Shutdown');
+  }, 15000);
+
+  console.log('Timeout for close')
+  setTimeout(() => {
+      agonesSDK.close();
+  }, 18000);
+
+  console.log('Timeout for exit')
+  setTimeout(() => {
+    process.exit(0);
+  }, 19000);
 }
 
 function updateGameState(game) {
