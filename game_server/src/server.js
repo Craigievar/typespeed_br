@@ -31,9 +31,9 @@ const socketIO = require('socket.io');
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
 //allow game-assets
-let mm = process.env.MATCHMAKER_SERVICE_PORT.replace("tcp://", "");
-console.log('MM is at ' + mm)
-const io = socketIO(server, {origins: mm});
+let gs = process.env.GAME_ASSETS_SERVICE_HOST.replace("tcp://", "") + ':' + process.env.GAME_ASSETS_SERVICE_PORT;;
+console.log('GS is at ' + gs)
+const io = socketIO(server, {origins: gs});
 
 const path = require('path');
 
@@ -467,7 +467,7 @@ setupAgones();
 // Emit gamestate to players
 console.log('Starting main loop');
 setInterval(function() {
-  console.log('looping');
+  //console.log('looping');
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
       if(numPlayers(gamesOnServer[game]) > 0){
