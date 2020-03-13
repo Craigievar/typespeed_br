@@ -17,7 +17,7 @@ app.use(cors());
 
 // Port is passed in by heroku
 const port = process.env.PORT || 8081;
-let gim = process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT.replace("tcp//", "");
+let gim = process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT.replace("tcp://", "");
 console.log("[Matchmaker] Connecting people to " + gim)
 
 const rooms = [];
