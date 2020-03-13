@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: autoscaler
+  # labels:
+  #   pod-type: autoscaler-pod
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    role: apps
+  containers:
+    - name: autoscaler
+      image: gcr.io/tsbr-cluster-demo/autoscaler:v0
+      imagePullPolicy: Always
+      env:
+        - name: SESSION_NAME
+          value: "autoscale-server"
+        - name: SERVERS_PER_NODE
+          value: "2"
+        - name: BUFFER_SIZE
+          value: "2"
+        - name: REFRESH_SECONDS
+          value: "10"
+        - name: MIN_SERVERS
+          value: "1"

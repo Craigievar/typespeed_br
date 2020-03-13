@@ -1,5 +1,5 @@
 # project
-gcloud config set project typespeed-br
+gcloud config set project tsbr-cluster-demo
 
 # firewall permissions
 gcloud compute firewall-rules create my-rule --allow=tcp:7000-8000
