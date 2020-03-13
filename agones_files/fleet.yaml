@@ -22,9 +22,7 @@ spec:
     spec:
       ports:
       - name: default
-        portPolicy: Static
         containerPort: 7030
-        hostPort: 7030
       template:
         spec:
           containers:
