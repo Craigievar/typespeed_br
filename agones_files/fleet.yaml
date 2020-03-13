@@ -23,6 +23,7 @@ spec:
       ports:
       - name: default
         containerPort: 7030
+        protocol: TCP
       template:
         spec:
           containers:
