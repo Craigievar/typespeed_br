@@ -85,7 +85,7 @@ spec:
         - name: SESSION_NAME
           value: "game-assets-server"
         - name: REACT_APP_MATCHMAKER_SERVICE
-          value: "35.227.137.9:80"
+          value: "34.82.175.234:80"
 ---
 apiVersion: v1
 kind: Service
