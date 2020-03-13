@@ -33,7 +33,7 @@ const server = http.Server(app); // eslint-disable-line new-cap
 //allow game-assets
 let gs = process.env.GAME_ASSETS_SERVICE_HOST.replace("tcp://", "") + ':' + process.env.GAME_ASSETS_SERVICE_PORT;;
 console.log('GS is at ' + gs)
-const io = socketIO(server, {origins: gs});
+const io = socketIO(server, {origins: '34.82.175.234:80'});
 
 const path = require('path');
 
