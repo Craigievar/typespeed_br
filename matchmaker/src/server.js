@@ -105,8 +105,9 @@ server.listen(port, function() {
 // every 5 seconds, lower number of players needed
 setInterval(function() {
   //console.log('looping');
-  if(minPlayers >= 2) {
-    minPlayers = Math.floor(minPlayers / 2);
+  if(minPlayers > 2) {
+    minPlayers = Math.max(Math.floor(minPlayers / 2), 2);
+    console.log('Shrank min players to make game. New Min: ' + minPlayers);
     io.in(currentMatchID).emit('mm_shrunk', {
       new_min: minPlayers
     });
