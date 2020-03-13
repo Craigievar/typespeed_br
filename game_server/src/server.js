@@ -31,7 +31,7 @@ const socketIO = require('socket.io');
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
 //allow game-assets
-const io = socketIO(server, {origins: "34.83.70.97:80"});
+const io = socketIO(server, {origins: "${process.env.MATCHMAKER_SERVICE_HOST}:{process.env.MATCHMAKER_SERVICE_PORT}"});
 
 const path = require('path');
 
