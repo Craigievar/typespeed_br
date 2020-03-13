@@ -32,6 +32,7 @@ const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
 //allow game-assets
 let mm = process.env.MATCHMAKER_SERVICE_PORT.replace("tcp://", "");
+console.log('MM is at ' + mm)
 const io = socketIO(server, {origins: mm});
 
 const path = require('path');
