@@ -242,21 +242,7 @@ function generateWords(game) {
   }
 }
 
-function resetGame(game) {
-  // process.exit();
-  game.state = 'LOBBY';
-  game.loadTime = COUNTDOWN_LENGTH;
-  game.time = 0;
-  game.inCountdown = false;
-  game.playersNeeded = MIN_PLAYERS_TO_START;
-  for (const { name, id, room } of Object.values(game.players)) {
-    game.players[id] = newPlayer(id);
-    game.players[id].room = room;
-    if(name) {
-      game.players[id].name = name;
-    }
-  }
-
+function killServer() {
   console.log('Timeout for shutdown')
   setTimeout(() => {
     console.log('Shutting down after 10 seconds...');
@@ -273,6 +259,23 @@ function resetGame(game) {
   setTimeout(() => {
     process.exit(0);
   }, 19000);
+}
+
+function resetGame(game) {
+  // process.exit();
+  game.state = 'LOBBY';
+  game.loadTime = COUNTDOWN_LENGTH;
+  game.time = 0;
+  game.inCountdown = false;
+  game.playersNeeded = MIN_PLAYERS_TO_START;
+  for (const { name, id, room } of Object.values(game.players)) {
+    game.players[id] = newPlayer(id);
+    game.players[id].room = room;
+    if(name) {
+      game.players[id].name = name;
+    }
+  }
+  // killServer();
 }
 
 function updateGameState(game) {
@@ -360,6 +363,10 @@ io.on('connection', function(socket) {
           console.log('[game_server]', 'deleting game ' + room);
         }, 3000);
       }
+    }
+    console.log(gamesOnServer.length + ' games on the server');
+    if (gamesOnServer.length === 0) {
+      killServer();
     }
   });
 
