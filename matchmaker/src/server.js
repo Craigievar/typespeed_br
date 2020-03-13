@@ -105,8 +105,10 @@ server.listen(port, function() {
 // every 5 seconds, lower number of players needed
 setInterval(function() {
   //console.log('looping');
-  minPlayers = Math.floor(minPlayers / 2);
-  io.in(currentMatchID).emit('mm_shrunk', {
-    new_min: minPlayers
-  });
+  if(minPlayers >= 2) {
+    minPlayers = Math.floor(minPlayers / 2);
+    io.in(currentMatchID).emit('mm_shrunk', {
+      new_min: minPlayers
+    });
+  }
 }, 5000);
