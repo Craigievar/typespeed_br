@@ -42,7 +42,9 @@ app.post('/create_game', function(req, res) {
     .set('Content-Type', 'application/json')
     .send(apiData)
     .then((createResponse) => {
-      let address = createResponse.body.status.address + ':' + createResponse.body.status.ports["port"];
+      // console.log(json.stringify(createResponse));
+      // console.log(createResponse);
+      let address = createResponse.body.status.address + ':' + createResponse.body.status.ports[0].port;
       console.log('[game_instance_manager] sending back address: ' + address);
       res.json({
         server_url: address

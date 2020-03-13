@@ -30,7 +30,8 @@ const socketIO = require('socket.io');
 
 const app = express();
 const server = http.Server(app); // eslint-disable-line new-cap
-const io = socketIO(server, {origins: "35.230.110.198:80"});
+//allow game-assets
+const io = socketIO(server, {origins: "34.83.70.97:80"});
 
 const path = require('path');
 
