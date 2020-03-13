@@ -43,6 +43,7 @@ class GameNetwork {
 
   connectToAddress(address: string | void) {
     if (this._socket) {
+      console.log('[GameNetwork] Client already connected, skipping connection');
       return;
     }
 
@@ -57,11 +58,14 @@ class GameNetwork {
         }
       });
 
+    console.log('[GameNetwork] Connecting to ' + address);
+    console.log('[GameNetwork] Room: ' + room);
     const socket: ?Socket = room && /^\d+$/.test(room) ?
       io(address, {query:"room=" + room}) :
       io(address);
     // const socket: ?Socket = io(address, {query:"room=1"});
     if (socket) {
+      console.log('[GameNetwork] Passed socket check');
       this._socket = socket;
       socket.emit('new player');
       socket.on('state', this._onChange);

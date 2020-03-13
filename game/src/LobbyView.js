@@ -45,7 +45,8 @@ function LobbyView({ gameServer, gameState }: Props) {
         case 'requesting_game':
           break;
         case 'game_created':
-          console.log(e.server_url);
+          console.log('Trying to connect to game server at ' + e.server_url);
+          console.log('Name is ' + playerName);
           gameServer.connectToAddress(e.server_url);
           gameServer.joinGame(playerName);
           break;

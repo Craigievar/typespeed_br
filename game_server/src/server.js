@@ -340,6 +340,7 @@ function updateGameState(game) {
 // Respond to inputs
 io.on('connection', function(socket) {
   socket.on('new player', function() {
+    console.log('New Player!');
     const room = socket.handshake.query.room ?
       socket.handshake.query.room.toString() : '0';
     console.log('[game_server]', room);
@@ -454,7 +455,7 @@ const setupAgones = async () => {
   await agonesSDK.connect();
 
   setInterval(() => {
-    console.log('send health ping: ' + Date.now().toString());
+    // console.log('send health ping: ' + Date.now().toString());
     agonesSDK.health();
   }, 2000);
 
@@ -490,6 +491,7 @@ setInterval(function() {
   //console.log('looping');
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
+      console.log(numPlayers(gamesOnServer[game]));
       if(numPlayers(gamesOnServer[game]) > 0){
         updateGameState(gamesOnServer[game]);
         io.to(game).emit('state', gamesOnServer[game]);
