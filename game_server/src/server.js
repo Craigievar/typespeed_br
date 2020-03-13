@@ -34,6 +34,7 @@ const server = http.Server(app); // eslint-disable-line new-cap
 let gs = process.env.GAME_ASSETS_SERVICE_HOST.replace("tcp://", "") + ':' + process.env.GAME_ASSETS_SERVICE_PORT;;
 console.log('GS is at ' + gs)
 const io = socketIO(server, {origins: '34.82.175.234:80'});
+let gameStarted = false;
 
 const path = require('path');
 
@@ -243,22 +244,35 @@ function generateWords(game) {
 }
 
 function killServer() {
-  console.log('Timeout for shutdown')
+  console.log('[game_server] killing server')
+  console.log('[game_server] Agones shutdown: 1s');
   setTimeout(() => {
-    console.log('Shutting down after 10 seconds...');
     agonesSDK.shutdown();
     console.log('...marked for Shutdown');
-  }, 15000);
+  }, 1000);
 
-  console.log('Timeout for close')
+  console.log('[game_server] Agones close: 2s');
   setTimeout(() => {
       agonesSDK.close();
-  }, 18000);
+  }, 2000);
 
-  console.log('Timeout for exit')
+  console.log('[game_server] process exit: 3s');
   setTimeout(() => {
     process.exit(0);
-  }, 19000);
+  }, 3000);
+}
+
+function maybeKillServer() {
+  console.log('[MaybeKillServer] Checking if we should kill the server');
+  let totalPlayers = 0;
+  for (const game in gamesOnServer){
+    if(gamesOnServer[game]){
+      totalPlayers += numPlayers(gamesOnServer[game]);
+    }
+  }
+  if(gameStarted && (gamesOnServer.size === 0 || totalPlayers === 0)){
+    killServer();
+  }
 }
 
 function resetGame(game) {
@@ -275,7 +289,9 @@ function resetGame(game) {
       game.players[id].name = name;
     }
   }
-  // killServer();
+  setTimeout(() => {
+    maybeKillServer();
+  }, 15000);
 }
 
 function updateGameState(game) {
@@ -291,6 +307,7 @@ function updateGameState(game) {
       //start game!
       console.log('[game_server]', 'updateGameState starting game', game);
       game.state = 'INGAME';
+      gameStarted = true;
       game.inCountdown = true;
 
       for (const player of Object.values(game.players)) {
@@ -362,13 +379,11 @@ io.on('connection', function(socket) {
         setTimeout(function() {
           delete gamesOnServer[room];
           console.log('[game_server]', 'deleting game ' + room);
+          maybeKillServer();
         }, 3000);
       }
     }
     console.log(gamesOnServer.size + ' games on the server');
-    if (gamesOnServer.size === 0) {
-      killServer();
-    }
   });
 
   socket.on('name', function(data) {
@@ -382,6 +397,7 @@ io.on('connection', function(socket) {
     console.log('[game_server]', 'starting game');
     const room = getRoom(socket);
     gamesOnServer[room].state = 'INGAME';
+    gameStarted = true;
     gamesOnServer[room].inCountdown = true;
     console.log('[game_server]', 'players: ', gamesOnServer[room].players);
     for (const player of Object.values(gamesOnServer[room].players)) {
@@ -462,26 +478,7 @@ const setupAgones = async () => {
   console.log('Marking as ready')
   let result = await agonesSDK.ready();
   console.log('Marked as ready');
-  // console.log('Timeout for shutdown')
-  // setTimeout(() => {
-  //   console.log('Shutting down after 300 seconds...');
-  //   agonesSDK.shutdown();
-  //   console.log('...marked for Shutdown');
-  // }, 300000);
-  //
-  // console.log('Timeout for close')
-  // setTimeout(() => {
-  //     agonesSDK.close();
-  // }, 390000);
-  //
-  // console.log('Timeout for exit')
-  // setTimeout(() => {
-  //   process.exit(0);
-  // }, 3100000);
 }
-
-
-
 
 console.log('Setting up agones')
 setupAgones();
@@ -491,7 +488,6 @@ setInterval(function() {
   //console.log('looping');
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
-      console.log(numPlayers(gamesOnServer[game]));
       if(numPlayers(gamesOnServer[game]) > 0){
         updateGameState(gamesOnServer[game]);
         io.to(game).emit('state', gamesOnServer[game]);
@@ -499,3 +495,9 @@ setInterval(function() {
     }
   }
 }, 1000 / 30);
+
+// check to kill server in case we miss a disconnect
+setInterval(function() {
+  console.log('[game_server][health check] check if should kill');
+  maybeKillServer();
+}, 30000);
