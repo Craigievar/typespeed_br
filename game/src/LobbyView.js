@@ -31,6 +31,11 @@ function LobbyView({ gameServer, gameState }: Props) {
 
     const matchmakingUri = new URL("http://34.83.107.182:80");
     matchmakingServer.connectToAddress(matchmakingUri.href);
+
+    if(gameServer.isConnected()){
+      gameServer.disconnect();
+    }
+
     console.log(matchmakingUri);
     return matchmakingServer.onChange((e) => {
       console.log(e);
@@ -40,6 +45,7 @@ function LobbyView({ gameServer, gameState }: Props) {
         case 'requesting_game':
           break;
         case 'game_created':
+          console.log(e.server_url);
           gameServer.connectToAddress(e.server_url);
           gameServer.joinGame(playerName);
           break;
