@@ -38,7 +38,7 @@ class GameNetwork {
 
   disconnect() {
     this._socket.close();
-    this.socket = undefined;
+    this._socket = undefined;
   }
 
   connectToAddress(address: string | void) {
