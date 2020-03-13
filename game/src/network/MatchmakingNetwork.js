@@ -25,6 +25,7 @@ const EVENTS = [
   'requesting_game',
   'game_created',
   'player_joined',
+  'mm_shrunk'
 ];
 
 type MatchmakingEvent =
@@ -43,6 +44,10 @@ type MatchmakingEvent =
       player_name: string,
       player_count: number,
       players_needed: number,
+    }
+  | {
+      type: 'mm_shrunk',
+      new_min: number,
     };
 
 class MatchmakingNetwork {
