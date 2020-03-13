@@ -51,9 +51,10 @@ const GameViewRenderers: { [GameView]: Function } = {
 
 let firstPass = true;
 
+console.log('Connecting to MM @ ' + process.env.REACT_APP_MATCHMAKER_SERVICE);
+
 function App() {
   const gameServer = useGameServer();
-  console.log('Connecting to MM @ ' + process.env.REACT_APP_MATCHMAKER_SERVICE);
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
     UNCONNECTED_GAME_STATE
@@ -72,7 +73,7 @@ function App() {
   useEffect(() => {
     gameState.state = 'LOBBY';
   }, []);
-  
+
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
       console.log('updating', updatedGameState, isReceivingGameState);

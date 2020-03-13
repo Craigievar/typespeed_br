@@ -244,6 +244,8 @@ function generateWords(game) {
 
 function resetGame(game) {
   // process.exit();
+  game.state = 'LOBBY';
+
   console.log('Timeout for shutdown')
   setTimeout(() => {
     console.log('Shutting down after 10 seconds...');
