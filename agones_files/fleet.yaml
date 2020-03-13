@@ -28,6 +28,7 @@ spec:
           containers:
           - name: server
             image: gcr.io/typespeed-br/game-server:v0
+            imagePullPolicy: Always
             # resources:
             #   requests:
             #     memory: "64Mi"

@@ -422,7 +422,7 @@ const setupAgones = async () => {
 
   console.log('Marking as ready')
   let result = await agonesSDK.ready();
-
+  console.log('Marked as ready');
   // console.log('Timeout for shutdown')
   // setTimeout(() => {
   //   console.log('Shutting down after 300 seconds...');
@@ -458,4 +458,4 @@ setInterval(function() {
       }
     }
   }
-}, 1000 / 1);
+}, 1000 / 30);
