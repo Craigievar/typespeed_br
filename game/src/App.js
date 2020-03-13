@@ -76,7 +76,7 @@ function App() {
 
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
-      console.log('updating', updatedGameState, isReceivingGameState);
+      // console.log('updating', updatedGameState, isReceivingGameState);
       if (isReceivingGameState) {
         setGameState(updatedGameState);
       }
@@ -99,7 +99,7 @@ function App() {
   const View = GameViewRenderers[gameState.state](player);
   const [shellClassName, setShellClassName] = useState(null);
 
-  console.log(gameState.state);
+  // console.log(gameState.state);
 
   return (
     <div className={classnames('App', shellClassName)}>

@@ -364,8 +364,8 @@ io.on('connection', function(socket) {
         }, 3000);
       }
     }
-    console.log(gamesOnServer.length + ' games on the server');
-    if (gamesOnServer.length === 0) {
+    console.log(gamesOnServer.size + ' games on the server');
+    if (gamesOnServer.size === 0) {
       killServer();
     }
   });

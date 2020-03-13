@@ -78,6 +78,7 @@ io.on('connection', function(socket) {
 
           // Notify everyone that a match has been succesfully created
           io.in(player.match_id).emit('game_created', { server_url: serverUrl.body.server_url });
+          console.log('Sending players to ' + serverUrl.body.server_url);
         }, 100);
     }
 
