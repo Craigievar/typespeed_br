@@ -13,6 +13,8 @@ const io = socketIO(server);
 
 const MIN_PLAYERS_DYNAMIC_START = 50;
 let minPlayers = MIN_PLAYERS_DYNAMIC_START;
+let shrinkingMinPlayers = false;
+let shrinkLoop = undefined;
 console.log('Min Players: ' + minPlayers);
 
 app.use(express.json());
@@ -56,9 +58,28 @@ io.on('connection', function(socket) {
     player.name = name;
     player.ready = true;
 
+    if(!shrinkingMinPlayers){
+      shrinkingMinPlayers = true;
+
+      // every 5 seconds, lower number of players needed
+      shrinkLoop = setInterval(function() {
+        //console.log('looping');
+        if(minPlayers > 2) {
+          minPlayers = Math.max(Math.floor(minPlayers / 1.2), 2);
+          console.log('Shrank min players to make game. New Min: ' + minPlayers);
+          io.in(currentMatchID).emit('mm_shrunk', {
+            new_min: minPlayers
+          });
+        } else {
+          shrinkLoop.clearInterval();
+        }
+      }, 1000);
+    }
+
     console.log('[matchmaker] Player join request: ', player);
 
     const readyPlayers = waitingPlayers.filter(p => p.ready);
+
     if (readyPlayers.length >= minPlayers) {
       io.in(player.match_id).emit('requesting_game');
       console.log('Num players ready: ' + readyPlayers.length);
@@ -73,6 +94,10 @@ io.on('connection', function(socket) {
           minPlayers = MIN_PLAYERS_DYNAMIC_START;
           waitingPlayers = waitingPlayers.filter(p => !p.ready);
           flushPlayerTimeoutID = null;
+
+          shrinkingMinPlayers = false;
+          shrinkLoop.clearInterval();
+
           console.log('[matchmaker] Requesting game creation from ', gim);
           const serverUrl = await superagent
             .post('http://' + gim + '/create_game')
@@ -98,18 +123,6 @@ app.get('/ping', function(req, res) {
     ping: true,
   });
 });
-
-// every 5 seconds, lower number of players needed
-setInterval(function() {
-  //console.log('looping');
-  if(minPlayers > 2) {
-    minPlayers = Math.max(Math.floor(minPlayers / 2), 2);
-    console.log('Shrank min players to make game. New Min: ' + minPlayers);
-    io.in(currentMatchID).emit('mm_shrunk', {
-      new_min: minPlayers
-    });
-  }
-}, 5000);
 
 // app.listen(port);
 server.listen(port, function() {
