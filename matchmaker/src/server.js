@@ -67,8 +67,9 @@ io.on('connection', function(socket) {
         if(minPlayers > 2) {
           minPlayers = Math.max(Math.floor(minPlayers / 1.2), 2);
           console.log('Shrank min players to make game. New Min: ' + minPlayers);
-          io.in(currentMatchID).emit('mm_shrunk', {
-            new_min: minPlayers
+          io.in(currentMatchID).emit('update_min_players', {
+            player_count: waitingPlayers.length,
+            players_needed: minPlayers,
           });
         } else {
           clearInterval(shrinkLoop);

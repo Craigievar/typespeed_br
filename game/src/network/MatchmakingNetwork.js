@@ -46,8 +46,9 @@ type MatchmakingEvent =
       players_needed: number,
     }
   | {
-      type: 'mm_shrunk',
-      new_min: number,
+      type: 'update_min_players',
+      players_needed: number,
+      player_count: number,
     };
 
 class MatchmakingNetwork {

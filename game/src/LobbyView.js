@@ -54,6 +54,8 @@ function LobbyView({ gameServer, gameState }: Props) {
           setPlayerCount(e.player_count);
           setPlayersNeeded(e.players_needed - e.player_count);
           break;
+        case 'update_min_players':
+          setPlayersNeeded(e.players_needed - e.player_count);
         default:
           break;
       }
