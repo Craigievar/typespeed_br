@@ -71,7 +71,7 @@ io.on('connection', function(socket) {
             new_min: minPlayers
           });
         } else {
-          shrinkLoop.clearInterval();
+          clearInterval(shrinkLoop);
         }
       }, 1000);
     }
@@ -96,7 +96,7 @@ io.on('connection', function(socket) {
           flushPlayerTimeoutID = null;
 
           shrinkingMinPlayers = false;
-          shrinkLoop.clearInterval();
+          clearInterval(shrinkLoop);
 
           console.log('[matchmaker] Requesting game creation from ', gim);
           const serverUrl = await superagent
