@@ -244,7 +244,7 @@ function generateWords(game) {
 }
 
 function killServer() {
-  console.log('[game_server] killing server')
+  console.log('[game_server] Killing Server')
   console.log('[game_server] Agones shutdown: 1s');
   setTimeout(() => {
     agonesSDK.shutdown();
@@ -265,12 +265,14 @@ function killServer() {
 function maybeKillServer() {
   console.log('[MaybeKillServer] Checking if we should kill the server');
   let totalPlayers = 0;
+  let gameCount = Object.keys(gamesOnServer).length;
   for (const game in gamesOnServer){
     if(gamesOnServer[game]){
       totalPlayers += numPlayers(gamesOnServer[game]);
     }
   }
-  if(gameStarted && (gamesOnServer.size === 0 || totalPlayers === 0)){
+  console.log('[MaybeKillServer] ' + gameCount + ' games and ' + totalPlayers + ' players');
+  if(gameStarted && (gameCount === 0 || totalPlayers === 0)){
     killServer();
   }
 }
@@ -383,7 +385,6 @@ io.on('connection', function(socket) {
         }, 3000);
       }
     }
-    console.log(gamesOnServer.size + ' games on the server');
   });
 
   socket.on('name', function(data) {
