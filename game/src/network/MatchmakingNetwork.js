@@ -25,7 +25,7 @@ const EVENTS = [
   'requesting_game',
   'game_created',
   'player_joined',
-  'mm_shrunk'
+  'update_min_players',
 ];
 
 type MatchmakingEvent =
