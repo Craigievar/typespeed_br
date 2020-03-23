@@ -51,18 +51,3 @@ kubectl apply -f scripts/setup_2.yaml
 # finally set up the fleet
 kubectl apply -f agones/fleet.yaml
 kubectl apply -f agones/fleet_auto_scaler.yaml
-
-kubectl apply -f game_instance_manager_sidecar/rbac.yaml
-
-# this goes first so that MM can reference it
-kubectl apply -f game_instance_manager/service.yaml
-# then this so that game servers can reference it!
-kubectl apply -f matchmaker/service.yaml
-
-# pods, static game asset service
-# TODO: feed matchmaking server into game file.
-kubectl apply -f scripts/setup_2.yaml
-
-# finally set up the fleet
-kubectl apply -f agones/fleet.yaml
-kubectl apply -f agones/fleet_auto_scaler.yaml

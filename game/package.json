@@ -22,7 +22,8 @@
     "react-scripts": "3.0.1",
     "socket.io": "^2.2.0",
     "superagent": "^5.1.2",
-    "tiny-uuid": "^1.0.0"
+    "tiny-uuid": "^1.0.0",
+    "react-sound": "^1.2.0"
   },
   "engines": {
     "node": "11.11.0"

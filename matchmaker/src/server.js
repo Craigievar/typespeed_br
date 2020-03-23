@@ -65,7 +65,7 @@ io.on('connection', function(socket) {
       shrinkLoop = setInterval(function() {
         //console.log('looping');
         if(minPlayers > 2) {
-          minPlayers = Math.max(Math.floor(minPlayers / 1.2), 2);
+          minPlayers = Math.max(Math.floor(minPlayers / 1.05), 2);
           console.log('Shrank min players to make game. New Min: ' + minPlayers);
           io.in(currentMatchID).emit('update_min_players', {
             player_count: waitingPlayers.length,
@@ -74,17 +74,18 @@ io.on('connection', function(socket) {
         } else {
           clearInterval(shrinkLoop);
         }
-      }, 1000);
+      }, 500);
     }
 
     console.log('[matchmaker] Player join request: ', player);
 
     const readyPlayers = waitingPlayers.filter(p => p.ready);
 
+    // TODO: Refactor this so we can call it on shrink as well.
+    // This is the code that creates a game once we've got enough players,
+    // and tells their client where to connect to the game server.
     if (readyPlayers.length >= minPlayers) {
       io.in(player.match_id).emit('requesting_game');
-      console.log('Num players ready: ' + readyPlayers.length);
-      console.log('Min Players: ' + minPlayers);
       flushPlayerTimeoutID =
         flushPlayerTimeoutID ||
         setTimeout(async () => {
@@ -92,14 +93,18 @@ io.on('connection', function(socket) {
 
           // Reset the matchmaking state
           currentMatchID = uuid();
-          minPlayers = MIN_PLAYERS_DYNAMIC_START;
           waitingPlayers = waitingPlayers.filter(p => !p.ready);
           flushPlayerTimeoutID = null;
 
+          // Clear the timer for shrinking minplayers
+          minPlayers = MIN_PLAYERS_DYNAMIC_START;
           shrinkingMinPlayers = false;
           clearInterval(shrinkLoop);
 
+          // Request game from agones through game_instance_manager
           console.log('[matchmaker] Requesting game creation from ', gim);
+
+          // TODO: error handling here
           const serverUrl = await superagent
             .post('http://' + gim + '/create_game')
             .send({ num_players: playersToJoin.length });

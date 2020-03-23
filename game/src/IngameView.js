@@ -13,7 +13,7 @@ import './AttackedAnimation.css';
 import useAnimation from './hooks/useAnimation';
 import isMobile from './isMobile';
 import classnames from 'classnames';
-
+import Sound from 'react-sound';
 type Props = {
   gameServer: GameNetwork,
   gameState: GameState,
@@ -28,6 +28,10 @@ function isLetter(str: string): boolean {
 }
 
 function getNumMatchedLetters(s1: string, s2: string): number {
+  if(!s1 || !s2) {
+    return 0;
+  }
+  
   let matchedLetters = 0;
   while (
     matchedLetters < s1.length &&
