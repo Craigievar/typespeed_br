@@ -25,6 +25,39 @@ const port = process.env.PORT || 8081;
 let gim = process.env.GAME_INSTANCE_MANAGER_SERVICE_PORT.replace("tcp://", "");
 console.log("[Matchmaker] Connecting people to " + gim)
 
+function maybeConnect(readyPlayers, match) {
+  if (readyPlayers.length >= minPlayers) {
+    io.in(match).emit('requesting_game');
+    flushPlayerTimeoutID =
+      flushPlayerTimeoutID ||
+      setTimeout(async () => {
+        const playersToJoin = waitingPlayers.filter(p => p.ready);
+
+        // Reset the matchmaking state
+        currentMatchID = uuid();
+        waitingPlayers = waitingPlayers.filter(p => !p.ready);
+        flushPlayerTimeoutID = null;
+
+        // Clear the timer for shrinking minplayers
+        minPlayers = MIN_PLAYERS_DYNAMIC_START;
+        shrinkingMinPlayers = false;
+        clearInterval(shrinkLoop);
+
+        // Request game from agones through game_instance_manager
+        console.log('[matchmaker] Requesting game creation from ', gim);
+
+        // TODO: error handling here
+        const serverUrl = await superagent
+          .post('http://' + gim + '/create_game')
+          .send({ num_players: playersToJoin.length });
+
+        // Notify everyone that a match has been succesfully created
+        io.in(match).emit('game_created', { server_url: serverUrl.body.server_url });
+        console.log('Sending players to ' + serverUrl.body.server_url);
+      }, 100);
+  }
+}
+
 const rooms = [];
 let waitingPlayers = [];
 let flushPlayerTimeoutID = null;
@@ -71,6 +104,9 @@ io.on('connection', function(socket) {
             player_count: waitingPlayers.length,
             players_needed: minPlayers,
           });
+
+          const readyPlayers = waitingPlayers.filter(p => p.ready);
+          maybeConnect(readyPlayers, player.match_id);
         } else {
           clearInterval(shrinkLoop);
         }
@@ -81,39 +117,40 @@ io.on('connection', function(socket) {
 
     const readyPlayers = waitingPlayers.filter(p => p.ready);
 
+    maybeConnect(readyPlayers, player.match_id);
     // TODO: Refactor this so we can call it on shrink as well.
     // This is the code that creates a game once we've got enough players,
     // and tells their client where to connect to the game server.
-    if (readyPlayers.length >= minPlayers) {
-      io.in(player.match_id).emit('requesting_game');
-      flushPlayerTimeoutID =
-        flushPlayerTimeoutID ||
-        setTimeout(async () => {
-          const playersToJoin = waitingPlayers.filter(p => p.ready);
-
-          // Reset the matchmaking state
-          currentMatchID = uuid();
-          waitingPlayers = waitingPlayers.filter(p => !p.ready);
-          flushPlayerTimeoutID = null;
-
-          // Clear the timer for shrinking minplayers
-          minPlayers = MIN_PLAYERS_DYNAMIC_START;
-          shrinkingMinPlayers = false;
-          clearInterval(shrinkLoop);
-
-          // Request game from agones through game_instance_manager
-          console.log('[matchmaker] Requesting game creation from ', gim);
-
-          // TODO: error handling here
-          const serverUrl = await superagent
-            .post('http://' + gim + '/create_game')
-            .send({ num_players: playersToJoin.length });
-
-          // Notify everyone that a match has been succesfully created
-          io.in(player.match_id).emit('game_created', { server_url: serverUrl.body.server_url });
-          console.log('Sending players to ' + serverUrl.body.server_url);
-        }, 100);
-    }
+    // if (readyPlayers.length >= minPlayers) {
+    //   io.in(player.match_id).emit('requesting_game');
+    //   flushPlayerTimeoutID =
+    //     flushPlayerTimeoutID ||
+    //     setTimeout(async () => {
+    //       const playersToJoin = waitingPlayers.filter(p => p.ready);
+    //
+    //       // Reset the matchmaking state
+    //       currentMatchID = uuid();
+    //       waitingPlayers = waitingPlayers.filter(p => !p.ready);
+    //       flushPlayerTimeoutID = null;
+    //
+    //       // Clear the timer for shrinking minplayers
+    //       minPlayers = MIN_PLAYERS_DYNAMIC_START;
+    //       shrinkingMinPlayers = false;
+    //       clearInterval(shrinkLoop);
+    //
+    //       // Request game from agones through game_instance_manager
+    //       console.log('[matchmaker] Requesting game creation from ', gim);
+    //
+    //       // TODO: error handling here
+    //       const serverUrl = await superagent
+    //         .post('http://' + gim + '/create_game')
+    //         .send({ num_players: playersToJoin.length });
+    //
+    //       // Notify everyone that a match has been succesfully created
+    //       io.in(player.match_id).emit('game_created', { server_url: serverUrl.body.server_url });
+    //       console.log('Sending players to ' + serverUrl.body.server_url);
+    //     }, 100);
+    // }
 
     // Inform all the waiting players that this person has joined the lobby
     io.in(player.match_id).emit('player_joined', {
