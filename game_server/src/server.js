@@ -475,23 +475,25 @@ io.on('connection', function(socket) {
   // code to handle the screen shake triggered by tilde
   socket.on('screen_shake', data => {
     const room = getRoom(socket);
-    const gameState = gamesOnServer[room];
-    if (gameState.players[socket.id].canShake) {
-      gameState.players[socket.id].canShake = false;
+    if(gamesOnServer && gamesOnServer[room] && gamesOnServer[room].state === 'INGAME') {
+      const player = gamesOnServer[room].players[socket.id] || {}
+      if (player.canShake) {
+        player.canShake = false;
 
-      // CD for the screen shake
-      setTimeout(() => {
-        gameState.players[socket.id].canShake = true;
-      }, 30000);
+        // CD for the screen shake
+        setTimeout(() => {
+          player.canShake = true;
+        }, 30000);
 
-      // Shake everyone elses screens
-      const currentTime = Date.now();
-      const otherPlayers = Object.entries(gameState.players).filter(
-        ([id, player]) => id !== socket.id
-      );
-      otherPlayers.forEach(([id, player]) => {
-        player.screenShakeUntilMs = currentTime + 5000;
-      });
+        // Shake everyone elses screens
+        const currentTime = Date.now();
+        const otherPlayers = Object.entries(gamesOnServer[room].players).filter(
+          ([id, player]) => id !== socket.id
+        );
+        otherPlayers.forEach(([id, player]) => {
+          player.screenShakeUntilMs = currentTime + 5000;
+        });
+      }
     }
   });
 });
