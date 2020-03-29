@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: game-assets
+spec:
+  replicas: 20
+  template:
+    metadata:
+      labels:
+        role: game-assets-server
+    spec:
+      nodeSelector:
+        role: apps
+      containers:
+      - name: game-assets
+        image: gcr.io/${PROJECT}/game-assets
+        imagePullPolicy: Always
+        readinessProbe:
+            httpGet:
+                path: /ping
+                port: 8080
+                scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 3
+        env:
+          - name: REACT_APP_MATCHMAKER_SERVICE
+            value: "http://matchmaker"
+        ports:
+        - containerPort: 8080

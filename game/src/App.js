@@ -13,6 +13,7 @@ import UnconnectedView from './UnconnectedView';
 import useGameServer from './network/useGameServer';
 import useLocalStorage from './hooks/useLocalStorage';
 import classnames from 'classnames';
+import GameNetwork from './network/GameNetwork';
 
 const { useEffect, useState } = React;
 
@@ -20,7 +21,7 @@ const UNCONNECTED_GAME_STATE: GameState = new GameState(
   {
     players: {},
     playersNeeded: 0,
-    state: 'UNCONNECTED',
+    state: 'LOBBY',
     playersLeft: 0,
     endTime: 0,
     loadTime: 0,
@@ -46,16 +47,14 @@ const GameViewRenderers: { [GameView]: Function } = {
   POSTGAME: (player: ?Player) => PostGameView,
   LOBBY: (player: ?Player) => LobbyView,
   INGAME: (player: ?Player) => getIngamePlayerView(player),
-    // player && ((player.inGame && (player.lost || player.won)) || !player.inGame)
-    //   ? PostGameView
-    //   : IngameView,
 };
 
 let firstPass = true;
 
+console.log('Connecting to MM @ ' + process.env.REACT_APP_MATCHMAKER_SERVICE);
+
 function App() {
   const gameServer = useGameServer();
-
   const [storedGameState, setStoredGameState] = useLocalStorage(
     'state',
     UNCONNECTED_GAME_STATE
@@ -70,8 +69,14 @@ function App() {
     new GameState(storedGameState, playerID)
   );
 
+  // Hack until we fix game state to not be controlled by the game server
+  useEffect(() => {
+    gameState.state = 'LOBBY';
+  }, []);
+
   useEffect(() => {
     const unsub = gameServer.onStateUpdate(updatedGameState => {
+      // console.log('updating', updatedGameState, isReceivingGameState);
       if (isReceivingGameState) {
         setGameState(updatedGameState);
       }
@@ -93,6 +98,8 @@ function App() {
   const player = gameState.getPlayer();
   const View = GameViewRenderers[gameState.state](player);
   const [shellClassName, setShellClassName] = useState(null);
+
+  // console.log(gameState.state);
 
   return (
     <div className={classnames('App', shellClassName)}>
