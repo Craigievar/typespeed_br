@@ -17,6 +17,8 @@ export type Player = {
   timesAttacked: number,
   canShake: boolean,
   screenShakeUntilMs: number,
+  isBot: boolean,
+  difficulty: number,
 };
 export type GameView = 'INGAME' | 'POSTGAME' | 'LOBBY' | 'UNCONNECTED';
 

@@ -17,6 +17,8 @@ const MIN_PLAYERS_TO_START = config.MIN_PLAYERS_TO_START;
 const COUNTDOWN_LENGTH = config.COUNTDOWN_LENGTH;
 const RESET_LENGTH = config.RESET_LENGTH;
 const PLAYERS_TO_WIN = config.PLAYERS_TO_WIN;
+const MIN_PLAYERS_FOR_GAME = config.MIN_PLAYERS_FOR_GAME;
+const BOT_DIFFICULTY = config.BOT_DIFFICULTY;
 
 // Dependencies
 const AgonesSDK = require('@google-cloud/agones-sdk');
@@ -52,6 +54,7 @@ server.listen(port, function() {
   console.log('[game_server]', 'Starting server on port ' + (port));
 });
 
+console.log('bot edition!')
 // Map of the games on this server.
 // For use in herokuapp, etc.; you can provide a ?room=x parameter
 // To host multiple games on a single server.
@@ -134,7 +137,102 @@ function newPlayer(id, room) {
     room: room,
     canShake: true,
     screenShakeUntilMs: 0,
+    isBot: false,
+    difficulty: null,
   };
+}
+
+// Difficulty 1-100
+function makeBot(num, difficulty, room) {
+  return {
+    prevWords: [],
+    nextWords: [],
+    lost: false,
+    won: false,
+    //target: findTarget(players, socket.id),
+    lobbyIndex: numPlayers(gamesOnServer[room]), //TODO; DYNAMICALLY FETCH THIS
+    inGame: true,
+    id: 'bot' + num,
+    ready: true,
+    name: '',
+    kills: 0,
+    wrongAnswers: 0,
+    rightAnswers: 0,
+    lastTarget: '',
+    lastKilled: '',
+    lastAttacker: '',
+    winner: '',
+    deathTime: 1,
+    timesAttacked: 0,
+    room: room,
+    canShake: true,
+    screenShakeUntilMs: 0,
+    isBot: true,
+    difficulty: difficulty,
+  };
+}
+
+function makeBots(game){
+  const room = game.room;
+  console.log('Considering making bots');
+
+  if(numReadyPlayers(game) >= MIN_PLAYERS_FOR_GAME){
+    console.log('No need to make bots');
+    return;
+  }
+
+  const gap = (MIN_PLAYERS_FOR_GAME - numReadyPlayers(game));
+  console.log('Filling gap');
+  for(let i = 0; i < gap; i++){
+    console.log('Making bot ' + i);
+    game.players[i] = makeBot(i, BOT_DIFFICULTY, game.room);
+    console.log('added bot player');
+    game.players[i].name = ('bot' + i);
+    console.log('named bot');
+    setTimeout(function() {
+      botWordLoop(i, room);
+    }, getBotWordTimeout(game.players[i].difficulty));
+  }
+}
+
+function botWordLoop(id, game){
+  console.log('Bot word loop');
+
+  if(!gamesOnServer[game] || !gamesOnServer[game].players){
+    console.log("Can't find game or players!");
+    return;
+  }
+  //
+  const player = gamesOnServer[game].players[id];
+  if(player && !player.lost && player.inGame) {
+    //sendword
+    console.log("Bot Attacking");
+    player.nextWords.shift();
+
+    const target = findTarget(gamesOnServer[player.room].players, id);
+    if (gamesOnServer[player.room].players[target]) {
+      gamesOnServer[player.room].players[target].nextWords.push(randomWord());
+      gamesOnServer[player.room].players[target].lastAttacker = id;
+      gamesOnServer[player.room].players[target].timesAttacked += 1;
+      player.lastTarget = gamesOnServer[player.room].players[target].name;
+    }
+
+    setTimeout(function() {
+      botWordLoop(id, game);
+    }, getBotWordTimeout(player.difficulty));
+    // setTimeout(
+    //     botWordLoop,
+    //     getBotWordTimeout(game.players[id].difficulty),
+    //     id, //bot id
+    //     game
+    // )
+  }
+
+
+}
+
+function getBotWordTimeout(difficulty){
+  return (3000 - ((100+Math.min(difficulty, 200)) * 10 * Math.random())); //timeout in MS
 }
 
 // Picks a random, living other player for the player's attack target
@@ -336,6 +434,9 @@ function resetGame(game) {
     if(name) {
       game.players[id].name = name;
     }
+    if(game.players[id].bot){
+      delete game.players[id];
+    }
   }
   setTimeout(() => {
     maybeKillServer();
@@ -357,6 +458,9 @@ function updateGameState(game) {
       game.state = 'INGAME';
       gameStarted = true;
       game.inCountdown = true;
+
+      console.log('Making bots!');
+      makeBots(game);
 
       for (const player of Object.values(game.players)) {
         if(player.ready) {
