@@ -31,7 +31,7 @@ function getNumMatchedLetters(s1: string, s2: string): number {
   if(!s1 || !s2) {
     return 0;
   }
-  
+
   let matchedLetters = 0;
   while (
     matchedLetters < s1.length &&
@@ -72,6 +72,10 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
       switch (true) {
         case isLetter(String.fromCharCode(event.keyCode)):
           word += String.fromCharCode(event.keyCode).toLowerCase();
+          if(getNumMatchedLetters(word, player.nextWords[0]) === player.nextWords[0].length){
+            gameServer.sendWord(word);
+            word = '';
+          }
           break;
 
         // backspace
@@ -81,6 +85,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
 
         // space or enter -- submit!
         case event.keyCode === 32:
+
         case event.keyCode === 13:
           gameServer.sendWord(word);
           word = '';
@@ -97,7 +102,7 @@ function IngameView({ gameServer, gameState, setShellClassName }: Props) {
 
       setInputValue(word);
     },
-    [inputValue, setInputValue]
+    [inputValue, setInputValue, gameState]
   );
   const onMobileSubmit = e => {
     gameServer.sendWord(inputValue);
