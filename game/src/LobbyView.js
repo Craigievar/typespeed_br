@@ -29,7 +29,7 @@ function LobbyView({ gameServer, gameState }: Props) {
   useEffect(() => {
     //const matchmakingUri = new URL(process.env.REACT_APP_MATCHMAKER_SERVICE);
 
-    const matchmakingUri = new URL("http://34.83.107.182:80");
+    const matchmakingUri = new URL("http://35.230.101.52:80");
     matchmakingServer.connectToAddress(matchmakingUri.href);
 
     if(gameServer.isConnected()){
