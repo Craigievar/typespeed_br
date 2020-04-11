@@ -52,7 +52,7 @@ kubectl apply -f matchmaker/service.yaml
 kubectl apply -f game/service.yaml
 
 #hooks
-# game server pods reference game service (CODE) for socket whitelist
+# game server pods reference game service (in server.js CODE) for socket whitelist
 # matchmaker references gim service (YAML)
 
 # pods, static game asset service
