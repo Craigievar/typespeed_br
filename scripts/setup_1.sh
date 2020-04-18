@@ -35,9 +35,9 @@ helm install my-release agones/agones
 
 # firewall permissions
 gcloud compute firewall-rules create game-server-firewall \
-  --allow udp:7000-8000 \
+  --allow tcp:7000-8000 \
   --target-tags game-server \
-  --description "Firewall to allow game server udp traffic"
+  --description "Firewall to allow game server tcp traffic"
 
 git clone https://github.com/Craigievar/typespeed_br.git
 # build dockers in case we haven't
@@ -55,7 +55,7 @@ kubectl apply -f game/service.yaml
 # game server pods reference game service (in server.js CODE) for socket whitelist
 # matchmaker references gim service (YAML)
 
-# pods, static game asset service
+# pods, static game asset service -- actually, add mm in server.js
 # TODO: feed matchmaking server into game file.
 kubectl apply -f scripts/setup_2.yaml
 
